@@ -25,8 +25,27 @@ Before Run, make sure you have install [Docker Desktop](https://www.docker.com/p
 - The service is available at localhost: ```http://localhost:8000```
 
 To run the all the test cases locally, please run the command ```nosetests```. The test cases have xx% code coverage currently.
+## Wishlist Model
+```
+wishlist = {
+            "id": Int,
+            "name": String,
+            "date_joined": DateTime,
+            "products": [],
+            "owner": String
+        }
+```
+## Product Model
+```
+product = {
+            "id": Int,
+            "wishlist_id": Int,
+            "name": String
+        }
+```
 
 ## Wishlist Service APIs
+
 
 These are the RESTful routes for `wishlists` and `products`
 ```
