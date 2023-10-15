@@ -152,6 +152,7 @@ class Wishlist(db.Model, PersistentBase):
     name = db.Column(db.String(64))
     date_joined = db.Column(db.Date(), nullable=False, default=date.today())
     products = db.relationship("Product", backref="wishlist", passive_deletes=True)
+    owner = db.Column(db.String(64))
 
     def __repr__(self):
         return f"<Wishlist {self.name} id=[{self.id}]>"
@@ -163,6 +164,7 @@ class Wishlist(db.Model, PersistentBase):
             "name": self.name,
             "date_joined": self.date_joined.isoformat(),
             "products": [],
+            "owner": self.owner
         }
         for product in self.products:
             wishlist["products"].append(product.serialize())
@@ -178,6 +180,7 @@ class Wishlist(db.Model, PersistentBase):
         try:
             self.name = data["name"]
             self.date_joined = date.fromisoformat(data["date_joined"])
+            self.owner = data["owner"]
             # handle inner list of products
             product_list = data.get("products")
             for json_address in product_list:

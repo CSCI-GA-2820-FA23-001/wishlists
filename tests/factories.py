@@ -32,18 +32,19 @@ class WishlistFactory(factory.Factory):
 
     id = factory.Sequence(lambda n: n)
     name = factory.Faker("name")
+    owner = factory.Faker("name")
     date_joined = FuzzyDate(date(2008, 1, 1))
 
     @factory.post_generation
-    def addresses(
+    def products(
         self, create, extracted, **kwargs
     ):  # pylint: disable=method-hidden, unused-argument
-        """Creates the addresses list"""
+        """Creates the products list"""
         if not create:
             return
 
         if extracted:
-            self.addresses = extracted
+            self.products = extracted
 
 
 class ProductFactory(factory.Factory):
@@ -56,6 +57,6 @@ class ProductFactory(factory.Factory):
         model = Product
 
     id = factory.Sequence(lambda n: n)
-    wishlist_id = None
+    # wishlist_id = None
     name = FuzzyChoice(choices=["home", "work", "other"])
     wishlist = factory.SubFactory(WishlistFactory)
