@@ -6,11 +6,14 @@ Test cases can be run with the following:
   coverage report -m
 """
 # import os
-# import logging
+import logging
 from unittest import TestCase
 from service import app
-from service.models import db
+from service.models import db, Wishlist
 from service.common import status  # HTTP Status Codes
+from tests.factories import WishlistFactory
+
+BASE_URL = '/wishlist'
 
 
 ######################################################################
@@ -43,3 +46,15 @@ class TestYourResourceServer(TestCase):
         """ It should call the home page """
         resp = self.client.get("/")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+    def test_create_wishlist(self):
+        """It should create a wishlist"""
+        test_list = WishlistFactory()
+        logging.debug("Test wishlist: %s", test_list.serialize())
+        response = self.client.post(f"{BASE_URL}/create", json=test_list.serialize())
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        res = response.get_json()
+        self.assertEqual(res["owner"], test_list.owner)
+        self.assertEqual(res["name"], test_list.name)
+        self.assertEqual(res["products"], test_list.products)

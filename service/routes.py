@@ -25,6 +25,19 @@ def index():
 
 
 ######################################################################
+# CREATE A wishlist
+######################################################################
+@app.route('/wishlist/create', methods=['POST'])
+def create_wishlist():
+    """create an empty wishlist with post method"""
+    new_list = Wishlist()
+    new_list.deserialize(request.get_json())
+    new_list.create()
+    message = new_list.serialize()
+
+    return jsonify(message), status.HTTP_201_CREATED
+
+######################################################################
 #  R E S T   A P I   E N D P O I N T S
 ######################################################################
 
