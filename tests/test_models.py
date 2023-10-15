@@ -271,3 +271,27 @@ class TestWishlist(unittest.TestCase):
         # self.assertEqual(new_product.name, product.name )
         self.assertEqual(str(wishlist), f"<Wishlist {wishlist.name} id=[{wishlist.id}]>")
         self.assertEqual(str(product), f"{product.name}:")
+
+    def test_update_no_id(self):
+        """It should not Update a wishlist with no id"""
+        wishlist = WishlistFactory()
+        logging.debug(wishlist)
+        wishlist.id = None
+        self.assertRaises(DataValidationError, wishlist.update)
+    
+    def test_deserialize_missing_data(self):
+        """It should not deserialize a Pet with missing data (date_join)"""
+        data = {
+            "id": 1,
+            "name": 'list',
+            "owner": 'chris',
+            "products": []
+            }
+        wishlist = Wishlist()
+        self.assertRaises(DataValidationError, wishlist.deserialize, data)
+
+    def test_deserialize_bad_data(self):
+        """It should not deserialize bad data"""
+        data = "this is not a dictionary"
+        wishlist = Wishlist()
+        self.assertRaises(DataValidationError, wishlist.deserialize, data)

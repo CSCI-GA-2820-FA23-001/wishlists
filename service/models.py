@@ -54,6 +54,8 @@ class PersistentBase:
         Updates a Wishlist to the database
         """
         logger.info("Updating %s", self.name)
+        if not self.id:
+            raise DataValidationError("Update called with empty ID field")
         db.session.commit()
 
     def delete(self):

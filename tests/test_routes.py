@@ -13,14 +13,15 @@ from service.models import db, Wishlist
 from service.common import status  # HTTP Status Codes
 from tests.factories import WishlistFactory
 
-BASE_URL = '/wishlist'
+BASE_URL = '/wishlists'
+
 
 
 ######################################################################
 #  T E S T   C A S E S
 ######################################################################
 # pylint: disable=too-many-public-methods
-class TestYourResourceServer(TestCase):
+class TestWishlistServer(TestCase):
     """ REST API Server Tests """
 
     @classmethod
@@ -39,6 +40,25 @@ class TestYourResourceServer(TestCase):
         """ This runs after each test """
 
     ######################################################################
+    #  HELPER FUNCTIONS
+    ######################################################################
+    def _create_wishlists(self, count):
+        """create count number of test wishlists """
+        wishlists = []
+        for _ in range(count):
+                wishlist = WishlistFactory()
+                resp = self.client.post(BASE_URL, json=wishlist.serialize())
+                self.assertEqual(
+                    resp.status_code,
+                    status.HTTP_201_CREATED,
+                    "Could not create test wishlist",
+                )
+                new_account = resp.get_json()
+                wishlist.id = new_account["id"]
+                wishlists.append(wishlist)
+        return wishlists
+
+    ######################################################################
     #  P L A C E   T E S T   C A S E S   H E R E
     ######################################################################
 
@@ -51,10 +71,16 @@ class TestYourResourceServer(TestCase):
         """It should create a wishlist"""
         test_list = WishlistFactory()
         logging.debug("Test wishlist: %s", test_list.serialize())
-        response = self.client.post(f"{BASE_URL}/create", json=test_list.serialize())
+        response = self.client.post(BASE_URL, json=test_list.serialize())
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         res = response.get_json()
         self.assertEqual(res["owner"], test_list.owner)
         self.assertEqual(res["name"], test_list.name)
         self.assertEqual(res["products"], test_list.products)
+    
+    def test_delete_wishlist(self):
+        """ It should delete a selected wishlist"""
+        wishlist = self._create_wishlists(1)[0]
+        resp = self.client.delete(f"{BASE_URL}/{wishlist.id}")
+        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
