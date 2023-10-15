@@ -1,7 +1,7 @@
 """
-My Service
+Wishlist Service
 
-Describe what your service does here
+Implementation of CRUD wishlists and products in the wishlists
 """
 
 from flask import jsonify, request, url_for, abort, make_response
@@ -11,7 +11,8 @@ from service.models import Product, Wishlist
 # Import Flask application
 from . import app
 
-BASE_URL = '/wishlists'
+BASE_URL = "/wishlists"
+
 
 ######################################################################
 # GET INDEX
@@ -19,16 +20,28 @@ BASE_URL = '/wishlists'
 @app.route("/")
 def index():
     """Root URL response"""
-    return (
-        "Reminder: return some useful information in json format about the service here",
-        status.HTTP_200_OK,
-    )
+    message = """
+    list_wishlists     GET      /wishlists
+    create_wishlists   POST     /wishlists
+    get_wishlists      GET      /wishlists/<wishlist_id>
+    update_wishlists   PUT      /wishlists/<wishlist_id>
+    delete_wishlists   DELETE   /wishlists/<wishlist_id>
+    list_products    GET      /wishlists/<wishlist_id>/products
+    create_products  POST     /wishlists/<wishlist_id>/products
+    get_products     GET      /wishlists/<wishlist_id>/products/<product_id>
+    update_products  PUT      /wishlists/<wishlist_id>/products/<product_id>
+    delete_products  DELETE   /wishlists/<wishlist_id>/products/<product_id>
+    """
+    response = make_response(message)
+    response.status = status.HTTP_200_OK
+    response.headers["Content-Type"] = "text/plain"
+    return response
 
 
 ######################################################################
 # CREATE A wishlist
 ######################################################################
-@app.route(BASE_URL, methods=['POST'])
+@app.route(BASE_URL, methods=["POST"])
 def create_wishlist():
     """create an empty wishlist with post method"""
     new_list = Wishlist()
@@ -59,6 +72,30 @@ def delete_accounts(wishlist_id):
     return make_response("", status.HTTP_204_NO_CONTENT)
 
 
+######################################################################
+#  CREATE a product in the wishlist
+######################################################################
+@app.route(f"{BASE_URL}/<int:wishlist_id>/products", methods=["POST"])
+def create_products(wishlist_id):
+    """
+    Create a product
+
+    This endpoint will create a product based the data in the body that is posted
+    """
+    app.logger.info("Request to create a product in wishlist %d", wishlist_id)
+    check_content_type("application/json")
+
+    wishlist = Wishlist.find(wishlist_id)
+    if wishlist:
+        new_product = Product()
+        new_product.deserialize(request.get_json())
+        new_product.create()
+        if new_product.wishlist_id != wishlist_id:
+            new_product.wishlist_id = wishlist_id
+        message = new_product.serialize()
+        return make_response(jsonify(message), status.HTTP_201_CREATED)
+    else:
+        return make_response("Error: Wishlist not found", status.HTTP_404_NOT_FOUND)
 
 
 ######################################################################
@@ -66,3 +103,20 @@ def delete_accounts(wishlist_id):
 ######################################################################
 
 # Place your REST API code here ...
+
+
+######################################################################
+#  U T I L I T Y   F U N C T I O N S
+######################################################################
+
+
+def check_content_type(media_type):
+    """Checks that the media type is correct"""
+    content_type = request.headers.get("Content-Type")
+    if content_type and content_type == media_type:
+        return
+    app.logger.error("Invalid Content-Type: %s", content_type)
+    abort(
+        status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
+        f"Content-Type must be {media_type}",
+    )

@@ -54,7 +54,7 @@ class TestWishlist(unittest.TestCase):
         wishlist = Wishlist(
             name=fake_wishlist.name,
             date_joined=fake_wishlist.date_joined,
-            owner=fake_wishlist.owner
+            owner=fake_wishlist.owner,
         )
         self.assertIsNotNone(wishlist)
         self.assertEqual(wishlist.id, None)
@@ -269,7 +269,9 @@ class TestWishlist(unittest.TestCase):
         wishlist = Wishlist.find(wishlist.id)
         product = wishlist.products[0]
         # self.assertEqual(new_product.name, product.name )
-        self.assertEqual(str(wishlist), f"<Wishlist {wishlist.name} id=[{wishlist.id}]>")
+        self.assertEqual(
+            str(wishlist), f"<Wishlist {wishlist.name} id=[{wishlist.id}]>"
+        )
         self.assertEqual(str(product), f"{product.name}:")
 
     def test_update_no_id(self):
@@ -278,15 +280,10 @@ class TestWishlist(unittest.TestCase):
         logging.debug(wishlist)
         wishlist.id = None
         self.assertRaises(DataValidationError, wishlist.update)
-    
+
     def test_deserialize_missing_data(self):
         """It should not deserialize a Pet with missing data (date_join)"""
-        data = {
-            "id": 1,
-            "name": 'list',
-            "owner": 'chris',
-            "products": []
-            }
+        data = {"id": 1, "name": "list", "owner": "chris", "products": []}
         wishlist = Wishlist()
         self.assertRaises(DataValidationError, wishlist.deserialize, data)
 
