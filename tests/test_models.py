@@ -260,7 +260,7 @@ class TestWishlist(unittest.TestCase):
         wishlist = Wishlist.find(wishlist.id)
         self.assertEqual(len(wishlist.products), 0)
 
-    def test_wishlist_address_tostring(self):
+    def test_wishlist_product_tostring(self):
         """It should print the required format"""
         wishlist = WishlistFactory()
         product = ProductFactory(wishlist=wishlist)
