@@ -23,10 +23,11 @@ def index():
         status.HTTP_200_OK,
     )
 
+
 ######################################################################
 # CREATE A wishlist
 ######################################################################
-@app.route( '/wishlist/create', methods=['POST'] )
+@app.route('/wishlist/create', methods=['POST'])
 def create_wishlist():
     """create an empty wishlist with post method"""
     new_list = Wishlist()

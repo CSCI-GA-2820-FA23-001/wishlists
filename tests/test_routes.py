@@ -15,6 +15,7 @@ from tests.factories import WishlistFactory
 
 BASE_URL = '/wishlist'
 
+
 ######################################################################
 #  T E S T   C A S E S
 ######################################################################
@@ -50,7 +51,7 @@ class TestYourResourceServer(TestCase):
         """It should create a wishlist"""
         test_list = WishlistFactory()
         logging.debug("Test wishlist: %s", test_list.serialize())
-        response = self.client.post(f"{BASE_URL}/create", json= test_list.serialize())
+        response = self.client.post(f"{BASE_URL}/create", json=test_list.serialize())
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         res = response.get_json()
