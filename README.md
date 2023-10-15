@@ -1,31 +1,55 @@
-# NYU DevOps Project Template
+# NYU DevOps Project- Wishlists Service
 
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Python](https://img.shields.io/badge/Language-Python-blue.svg)](https://python.org/)
 
-This is a skeleton you can use to start your projects
+
 
 ## Overview
 
-This project template contains starter code for your class project. The `/service` folder contains your `models.py` file for your model and a `routes.py` file for your service. The `/tests` folder has test case starter code for testing the model and the service separately. All you need to do is add your functionality. You can use the [lab-flask-tdd](https://github.com/nyu-devops/lab-flask-tdd) for code examples to copy from.
+This repository contains code for Wishlists for an e-commerce web site. This shows how to create a REST API with subordinate resources like wishlists that have products:
 
-## Automatic Setup
 
-The best way to use this repo is to start your own repo using it as a git template. To do this just press the green **Use this template** button in GitHub and this will become the source for your repository.
+## Development environment setup
 
-## Manual Setup
+Select the appropriate development environment setup. Most students should choose the first one using Docker and Visual Studio Code.
 
-You can also clone this repository and then copy and paste the starter code into your project repo folder on your local computer. Be careful not to copy over your own `README.md` file so be selective in what you copy.
+## Running the service locally
 
-There are 4 hidden files that you will need to copy manually if you use the Mac Finder or Windows Explorer to copy files from this folder into your repo folder.
+Before Run, make sure you have install [Docker Desktop](https://www.docker.com/products/docker-desktop), [Visual Studio Code](https://code.visualstudio.com), [Remote Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) first. Then you could clone the repository and then run the following commands:
 
-These should be copied using a bash shell as follows:
+- ```cd wishlist```
+- ```code .```
+- Reopen the folder in Dev Container
+- Run ```flask run``` command on the terminal
+- The service is available at localhost: ```http://localhost:8000```
 
-```bash
-    cp .gitignore  ../<your_repo_folder>/
-    cp .flaskenv ../<your_repo_folder>/
-    cp .gitattributes ../<your_repo_folder>/
+To run the all the test cases locally, please run the command ```nosetests```. The test cases have xx% code coverage currently.
+
+## Wishlist Service APIs
+
+These are the RESTful routes for `wishlists` and `products`
 ```
+Endpoint          Methods  Rule
+----------------  -------  -----------------------------------------------------
+index             GET      /
+
+list_wishlists     GET      /wishlists
+create_wishlists   POST     /wishlists
+get_wishlists      GET      /wishlists/<wishlist_id>
+update_wishlists   PUT      /wishlists/<wishlist_id>
+delete_wishlists   DELETE   /wishlists/<wishlist_id>
+
+list_products    GET      /wishlists/<int:wishlist_id>/products
+create_products  POST     /wishlists/<wishlist_id>/products
+get_products     GET      /wishlists/<wishlist_id>/products/<product_id>
+update_products  PUT      /wishlists/<wishlist_id>/products/<product_id>
+delete_products  DELETE   /wishlists/<wishlist_id>/products/<product_id>
+```
+<!-- 
+The test cases have 95% test coverage and can be run with `nosetests` -->
+
+
 
 ## Contents
 
