@@ -9,7 +9,7 @@ Test cases can be run with the following:
 import logging
 from unittest import TestCase
 from service import app
-from service.models import db, Wishlist
+from service.models import db, Wishlist, Product
 from service.common import status  # HTTP Status Codes
 from tests.factories import WishlistFactory, ProductFactory
 
@@ -57,6 +57,24 @@ class TestWishlistServer(TestCase):
             wishlists.append(new_wishlist)
         return wishlists
 
+    def _create_products(self, wishlist_id, count):
+        """create count number of product in a given wishlist"""
+        products = []
+        for _ in range(count):
+            product = ProductFactory(wishlist_id=wishlist_id)
+            resp = self.client.post(
+                f"{BASE_URL}/{wishlist_id}/products", json=product.serialize()
+            )
+            self.assertEqual(
+                resp.status_code,
+                status.HTTP_201_CREATED,
+                "Could not create test product",
+            )
+            new_product_id = resp.get_json()["id"]
+            new_product = Product.find(new_product_id)
+            products.append(new_product)
+        return products
+
     ######################################################################
     #  P L A C E   T E S T   C A S E S   H E R E
     ######################################################################
@@ -83,6 +101,50 @@ class TestWishlistServer(TestCase):
         wishlist = self._create_wishlists(1)[0]
         resp = self.client.delete(f"{BASE_URL}/{wishlist.id}")
         self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
+
+    def test_create_product(self):
+        """It should create a product in a wishlist"""
+        test_wishlist = self._create_wishlists(1)[0]
+        test_product = ProductFactory(wishlist_id=test_wishlist.id)
+        response = self.client.post(
+            f"{BASE_URL}/{test_wishlist.id}/products", json=test_product.serialize()
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        resp = response.get_json()
+        self.assertEqual(resp["wishlist_id"], test_wishlist.id)
+        self.assertEqual(resp["name"], test_product.name)
+        # TBA
+        # self.assertEqual(res["quantity"], test_product.quantity)
+
+        # check if the product is in the wishlist
+        product_id = resp["id"]
+        product = Product.find(product_id)
+        products = test_wishlist.products
+        self.assertIn(product, products)
+
+    def test_create_product_wishlist_not_exist(self):
+        """It should report 404 error: wishlist not exist when creating products"""
+        response = self.client.post(
+            f"{BASE_URL}/0/products", json={"name": "Product", "wishlist_id": 0}
+        )
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_delete_product(self):
+        """It should delete a product in a wishlist"""
+        test_wishlist = self._create_wishlists(1)[0]
+        test_product = self._create_products(test_wishlist.id, 1)[0]
+        response = self.client.delete(
+            f"{BASE_URL}/{test_wishlist.id}/products/{test_product.id}"
+        )
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+    def test_delete_product_wishlist_not_exist(self):
+        """It should report 404 error: wishlist not exist when deleting a product"""
+        test_wishlist = self._create_wishlists(1)[0]
+        test_product = self._create_products(test_wishlist.id, 1)[0]
+        response = self.client.delete(f"{BASE_URL}/0/products/{test_product.id}")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_get_wishlist_id(self):
         """It should Get an Wishlist by id"""
