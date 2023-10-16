@@ -213,3 +213,13 @@ class Wishlist(db.Model, PersistentBase):
         """
         logger.info("Processing name query for %s ...", name)
         return cls.query.filter(cls.name == name)
+    
+    @classmethod
+    def find_by_owner(cls, owner):
+        """Returns all Wishlists with the given owner
+
+        Args:
+            owner (string): the owner of the Wishlists you want to match
+        """
+        logger.info("Processing name query for %s ...", owner)
+        return cls.query.filter(cls.owner == owner)

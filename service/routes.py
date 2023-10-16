@@ -30,6 +30,27 @@ def index():
         status.HTTP_200_OK,
     )
 
+######################################################################
+# LIST ALL wishlist
+######################################################################
+@app.route(BASE_URL, methods=["GET"])
+def list_wishlists():
+    """Returns all of the wishlists"""
+    app.logger.info("Request for listing all wishlists")
+    wishlists = []
+
+    # Process the query string if any
+    owner = request.args.get("owner")
+    if owner:
+        accounts = Wishlist.find_by_owner(owner)
+    else:
+        accounts = Wishlist.all()
+
+    # Return as an array of dictionaries
+    results = [account.serialize() for account in accounts]
+
+    return make_response(jsonify(results), status.HTTP_200_OK)
+
 
 ######################################################################
 # CREATE A wishlist

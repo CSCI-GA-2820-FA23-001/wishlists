@@ -138,6 +138,16 @@ class TestWishlist(unittest.TestCase):
         self.assertEqual(same_wishlist.id, wishlist.id)
         self.assertEqual(same_wishlist.name, wishlist.name)
 
+    def test_find_by_owner(self):
+        """It should Find an Wishlist by name"""
+        wishlist = WishlistFactory()
+        wishlist.create()
+
+        # Fetch it back by name
+        same_wishlist = Wishlist.find_by_owner(wishlist.owner)[0]
+        self.assertEqual(same_wishlist.id, wishlist.id)
+        self.assertEqual(same_wishlist.owner, wishlist.owner)
+
     def test_serialize_an_wishlist(self):
         """It should Serialize an wishlist"""
         wishlist = WishlistFactory()
