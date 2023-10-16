@@ -27,7 +27,7 @@ def index():
             # later change to list_wishlist
             paths=url_for("create_wishlist", _external=True),
         ),
-        status.HTTP_200_OK
+        status.HTTP_200_OK,
     )
 
 
@@ -103,6 +103,31 @@ def create_products(wishlist_id):
     message = new_product.serialize()
     return make_response(jsonify(message), status.HTTP_201_CREATED)
 
+
+######################################################################
+#  DELETE a product in the wishlist
+######################################################################
+@app.route(
+    f"{BASE_URL}/<int:wishlist_id>/products/<int:product_id>", methods=["DELETE"]
+)
+def delete_products(wishlist_id, product_id):
+    """
+    Delete a product
+
+    This endpoint will delete a product based the id specified in the path
+    """
+    app.logger.info("Request to delete a product in wishlist %d", wishlist_id)
+    wishlist = Wishlist.find(wishlist_id)
+    if not wishlist:
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"Wishlist {wishlist_id} not exist",
+        )
+    product = Product.find(product_id)
+    if product:
+        product.delete()
+
+    return make_response("", status.HTTP_204_NO_CONTENT)
 
 
 ######################################################################
