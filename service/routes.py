@@ -87,11 +87,22 @@ def create_products(wishlist_id):
 
     wishlist = Wishlist.find(wishlist_id)
     if wishlist:
+        # Create the product
         new_product = Product()
-        new_product.deserialize(request.get_json())
+        info = request.get_json()
+        new_product.deserialize(info)
+        new_product.wishlist = wishlist
         new_product.create()
+
+        # Update wishlist_id if not consistent
         if new_product.wishlist_id != wishlist_id:
             new_product.wishlist_id = wishlist_id
+            new_product.update()
+
+        # wishlist.products.append(new_product)
+        wishlist.update()
+
+        # Return response
         message = new_product.serialize()
         return make_response(jsonify(message), status.HTTP_201_CREATED)
     else:

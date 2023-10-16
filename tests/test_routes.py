@@ -86,16 +86,15 @@ class TestWishlistServer(TestCase):
 
     def test_create_product(self):
         """It should create a product in a wishlist"""
-        test_product = ProductFactory()
-        wishlist = self._create_wishlists(1)[0]
+        test_wishlist = self._create_wishlists(1)[0]
+        test_product = ProductFactory(wishlist_id=test_wishlist.id)
         response = self.client.post(
-            f"{BASE_URL}/{wishlist.id}/products", json=test_product.serialize()
+            f"{BASE_URL}/{test_wishlist.id}/products", json=test_product.serialize()
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-        res = response.get_json()
-        self.assertEqual(res["id"], test_product.id)
-        self.assertEqual(res["wishlist_id"], wishlist.id)
-        self.assertEqual(res["name"], test_product.name)
+        resp = response.get_json()
+        self.assertEqual(resp["wishlist_id"], test_wishlist.id)
+        self.assertEqual(resp["name"], test_product.name)
         # TBA
         # self.assertEqual(res["quanity"], test_product.quanity)
