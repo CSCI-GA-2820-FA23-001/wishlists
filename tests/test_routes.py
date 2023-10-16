@@ -52,9 +52,9 @@ class TestWishlistServer(TestCase):
                 status.HTTP_201_CREATED,
                 "Could not create test wishlist",
             )
-            new_account = resp.get_json()
-            wishlist.id = new_account["id"]
-            wishlists.append(wishlist)
+            new_wishlist_id = resp.get_json()["id"]
+            new_wishlist = Wishlist.find(new_wishlist_id)
+            wishlists.append(new_wishlist)
         return wishlists
 
     ######################################################################
@@ -102,9 +102,6 @@ class TestWishlistServer(TestCase):
     def test_create_product_wishlist_not_exist(self):
         """It should report 404 error: wishlist not exist"""
         response = self.client.post(
-            f"{BASE_URL}/0/products",
-            json={'name': 'Product', 'wishlist_id': 0}
+            f"{BASE_URL}/0/products", json={"name": "Product", "wishlist_id": 0}
         )
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-
-    
