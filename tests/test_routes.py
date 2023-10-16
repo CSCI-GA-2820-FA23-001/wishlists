@@ -11,7 +11,7 @@ from unittest import TestCase
 from service import app
 from service.models import db, Wishlist
 from service.common import status  # HTTP Status Codes
-from tests.factories import WishlistFactory
+from tests.factories import WishlistFactory, ProductFactory
 
 BASE_URL = "/wishlists"
 
