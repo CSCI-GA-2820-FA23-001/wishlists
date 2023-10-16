@@ -149,7 +149,35 @@ class TestWishlistServer(TestCase):
         response = self.client.delete(f"{BASE_URL}/0/products/{test_product.id}")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-    def test_get_wishlist_without_owner(self):
+    def test_get_wishlist_id(self):
+        """It should Get an Wishlist by id"""
+        wishlists = self._create_wishlists(3)
+        # print(wishlists)
+        resp = self.client.get(f"{BASE_URL}/{wishlists[1].id}")
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertEqual(data["name"], wishlists[1].name)
+
+    def test_get_wishlist(self):
+        """It should Read a single Wishlist"""
+        # get the id of an wishlist
+        wishlists = self._create_wishlists(1)
+        wishlist = wishlists[0]
+        resp = self.client.get(
+            f"{BASE_URL}/{wishlist.id}", content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertEqual(data["id"], wishlist.id)
+
+    def test_get_wishlist_not_found(self):
+        """It should not Read an Wishlist that is not found"""
+        resp = self.client.get(f"{BASE_URL}/0")
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+
+    def test_list_wishlist_without_owner(self):
         """It should Get a list of Accounts"""
         self._create_wishlists(5)
         resp = self.client.get(BASE_URL)
@@ -157,7 +185,7 @@ class TestWishlistServer(TestCase):
         data = resp.get_json()
         self.assertEqual(len(data), 5)
 
-    def test_get_account_by_owner(self):
+    def test_list_wishlist_by_owner(self):
         """It should Get an Account by Name"""
         wishlists = self._create_wishlists(3)
         resp = self.client.get(BASE_URL, query_string=f"owner={wishlists[1].owner}")

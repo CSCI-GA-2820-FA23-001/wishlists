@@ -186,12 +186,12 @@ class TestWishlist(unittest.TestCase):
         wishlist = Wishlist()
         self.assertRaises(DataValidationError, wishlist.deserialize, [])
 
-    def test_deserialize_address_key_error(self):
+    def test_deserialize_product_key_error(self):
         """It should not Deserialize an product with a KeyError"""
         product = Product()
         self.assertRaises(DataValidationError, product.deserialize, {})
 
-    def test_deserialize_address_type_error(self):
+    def test_deserialize_product_type_error(self):
         """It should not Deserialize an product with a TypeError"""
         product = Product()
         self.assertRaises(DataValidationError, product.deserialize, [])
@@ -212,15 +212,15 @@ class TestWishlist(unittest.TestCase):
         new_wishlist = Wishlist.find(wishlist.id)
         self.assertEqual(new_wishlist.products[0].name, product.name)
 
-        address2 = ProductFactory(wishlist=wishlist)
-        wishlist.products.append(address2)
+        product2 = ProductFactory(wishlist=wishlist)
+        wishlist.products.append(product2)
         wishlist.update()
 
         new_wishlist = Wishlist.find(wishlist.id)
         self.assertEqual(len(new_wishlist.products), 2)
-        self.assertEqual(new_wishlist.products[1].name, address2.name)
+        self.assertEqual(new_wishlist.products[1].name, product2.name)
 
-    def test_update_wishlist_address(self):
+    def test_update_wishlist_product(self):
         """It should Update an wishlists product"""
         wishlists = Wishlist.all()
         self.assertEqual(wishlists, [])
