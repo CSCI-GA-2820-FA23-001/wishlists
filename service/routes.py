@@ -53,7 +53,7 @@ def delete_wishlists(wishlist_id):
     app.logger.info("Request to delete wishlist with id: %s", wishlist_id)
 
     # Retrieve the account to delete and delete it if it exists
-    wishlist = Wishlist.find_by_id(wishlist_id)
+    wishlist = Wishlist.find(wishlist_id)
     if wishlist:
         wishlist.delete()
 
