@@ -21,7 +21,7 @@ BASE_URL = "/wishlists"
 def index():
     """Root URL response"""
     return (
-        "Reminder: return some useful information in json format about the service here",
+        "Wishlist REST API Service",
         status.HTTP_200_OK,
     )
 
