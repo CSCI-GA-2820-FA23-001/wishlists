@@ -52,9 +52,9 @@ class TestWishlistServer(TestCase):
                 status.HTTP_201_CREATED,
                 "Could not create test wishlist",
             )
-            new_wishlist = resp.get_json()
-            wishlist.id = new_wishlist["id"]
-            wishlists.append(wishlist)
+            new_wishlist_id = resp.get_json()["id"]
+            new_wishlist = Wishlist.find(new_wishlist_id)
+            wishlists.append(new_wishlist)
         return wishlists
 
     ######################################################################
@@ -84,12 +84,12 @@ class TestWishlistServer(TestCase):
         resp = self.client.delete(f"{BASE_URL}/{wishlist.id}")
         self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
 
-    # def test_get_wishlist(self):
-    #     """It should Get an Wishlist by Name"""
-    #     wishlists = self._create_wishlists(3)
-    #     print(wishlists)
-    #     resp = self.client.get(BASE_URL, query_string=f"id={wishlists[1].id}")
+    def test_get_wishlist(self):
+        """It should Get an Wishlist by Name"""
+        wishlists = self._create_wishlists(3)
+        # print(wishlists)
+        resp = self.client.get(f"{BASE_URL}/{wishlists[1].id}")
 
-    #     self.assertEqual(resp.status_code, status.HTTP_200_OK)
-    #     data = resp.get_json()
-    #     self.assertEqual(data[0]["name"], wishlists[1].name)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertEqual(data["name"], wishlists[1].name)
