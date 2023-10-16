@@ -166,7 +166,7 @@ class Wishlist(db.Model, PersistentBase):
             "name": self.name,
             "date_joined": self.date_joined.isoformat(),
             "products": [],
-            "owner": self.owner
+            "owner": self.owner,
         }
         for product in self.products:
             wishlist["products"].append(product.serialize())
@@ -209,3 +209,9 @@ class Wishlist(db.Model, PersistentBase):
         """
         logger.info("Processing name query for %s ...", name)
         return cls.query.filter(cls.name == name)
+
+    @classmethod
+    def find(cls, by_id):
+        """Finds a Wishlist by its id"""
+        logger.info("Processing lookup for Wishlist with id %s ...", by_id)
+        return cls.query.get(by_id)

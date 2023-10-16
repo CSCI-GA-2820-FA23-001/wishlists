@@ -11,7 +11,8 @@ from service.models import Product, Wishlist
 # Import Flask application
 from . import app
 
-BASE_URL = '/wishlists'
+BASE_URL = "/wishlists"
+
 
 ######################################################################
 # GET INDEX
@@ -28,7 +29,7 @@ def index():
 ######################################################################
 # CREATE A wishlist
 ######################################################################
-@app.route(BASE_URL, methods=['POST'])
+@app.route(BASE_URL, methods=["POST"])
 def create_wishlist():
     """create an empty wishlist with post method"""
     new_list = Wishlist()
@@ -43,7 +44,7 @@ def create_wishlist():
 # DELETE A wishlist
 ######################################################################
 @app.route(f"{BASE_URL}/<int:wishlist_id>", methods=["DELETE"])
-def delete_accounts(wishlist_id):
+def delete_wishlists(wishlist_id):
     """
     Delete an Account
 
@@ -52,13 +53,31 @@ def delete_accounts(wishlist_id):
     app.logger.info("Request to delete wishlist with id: %s", wishlist_id)
 
     # Retrieve the account to delete and delete it if it exists
-    wishlist = Wishlist.find(wishlist_id)
+    wishlist = Wishlist.find_by_id(wishlist_id)
     if wishlist:
         wishlist.delete()
 
     return make_response("", status.HTTP_204_NO_CONTENT)
 
 
+######################################################################
+# RETRIEVE A wishlist by id
+######################################################################
+@app.route(f"{BASE_URL}/<int:wishlist_id>", methods=["GET"])
+def get_wishlists(wishlist_id):
+    """
+    Retrieve a single Wishlist
+    This endpoint will return an Wishlist based on it's id
+    """
+    app.logger.info("Request for Wishlist with id: %s", wishlist_id)
+    # See if the wishlist exists and abort if it doesn't
+    wishlist = Wishlist.find(wishlist_id)
+    if not wishlist:
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"Wishlist with id '{wishlist_id}' could not be found.",
+        )
+    return wishlist.serialize(), status.HTTP_200_OK
 
 
 ######################################################################
