@@ -33,11 +33,14 @@ class TestWishlistServer(TestCase):
 
     def setUp(self):
         """This runs before each test"""
+        db.session.query(Wishlist).delete()  # clean up the last tests
+        db.session.query(Product).delete()  # clean up the last tests
+        db.session.commit()
         self.client = app.test_client()
 
     def tearDown(self):
         """This runs after each test"""
-
+        db.session.remove()
     ######################################################################
     #  HELPER FUNCTIONS
     ######################################################################
@@ -172,4 +175,43 @@ class TestWishlistServer(TestCase):
         """It should not Read an Wishlist that is not found"""
         resp = self.client.get(f"{BASE_URL}/0")
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+
+    def test_list_wishlist_without_owner(self):
+        """It should Get a list of Accounts"""
+        self._create_wishlists(5)
+        resp = self.client.get(BASE_URL)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertEqual(len(data), 5)
+
+    def test_list_wishlist_by_owner(self):
+        """It should Get an Account by Name"""
+        wishlists = self._create_wishlists(3)
+        resp = self.client.get(BASE_URL, query_string=f"owner={wishlists[1].owner}")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertEqual(data[0]["owner"], wishlists[1].owner)
+
+
+######################################################################
+#  E R R O R    H A N D L E R   T E S T
+######################################################################
+    def test_bad_request(self):
+        """It should not Create when sending the wrong data"""
+        resp = self.client.post(BASE_URL, json={"name": "not enough data"})
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_unsupported_media_type(self):
+        """It should not Create when sending wrong media type"""
+        wishlist = WishlistFactory()
+        resp = self.client.post(
+            BASE_URL, json=wishlist.serialize(), content_type="test/html"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+    
+    def test_method_not_allowed(self):
+        """It should not allow an illegal method call"""
+        resp = self.client.put(BASE_URL, json={"not": "today"})
+        self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
