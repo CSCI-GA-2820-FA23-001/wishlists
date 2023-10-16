@@ -51,8 +51,7 @@ These are the RESTful routes for `wishlists` and `products`
 ```
 Endpoint          Methods  Rule
 ----------------  -------  -----------------------------------------------------
-index             GET      /
-
+index              GET       /
 list_wishlists     GET      /wishlists
 create_wishlists   POST     /wishlists
 get_wishlists      GET      /wishlists/<wishlist_id>
