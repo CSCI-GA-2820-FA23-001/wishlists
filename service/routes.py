@@ -30,6 +30,7 @@ def index():
         status.HTTP_200_OK,
     )
 
+
 ######################################################################
 # LIST ALL wishlist
 ######################################################################
@@ -151,7 +152,6 @@ def delete_products(wishlist_id, product_id):
     return make_response("", status.HTTP_204_NO_CONTENT)
 
 
-
 ######################################################################
 # RETRIEVE A wishlist by id
 ######################################################################
@@ -171,6 +171,27 @@ def get_wishlists(wishlist_id):
         )
     return wishlist.serialize(), status.HTTP_200_OK
 
+
+######################################################################
+# LIST PRODUCTS
+######################################################################
+@app.route(f"{BASE_URL}/<int:wishlist_id>/products", methods=["GET"])
+def list_products(wishlist_id):
+    """Returns all of the products for a wishlist"""
+    app.logger.info("Request for all Products for Wishlist with id: %s", wishlist_id)
+
+    # See if the wishlist exists and abort if it doesn't
+    wishlist = Wishlist.find(wishlist_id)
+    if not wishlist:
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"Wishlist with id '{wishlist_id}' could not be found.",
+        )
+
+    # Get the addresses for the account
+    results = [product.serialize() for product in wishlist.products]
+
+    return make_response(jsonify(results), status.HTTP_200_OK)
 
 
 ######################################################################
