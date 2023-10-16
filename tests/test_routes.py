@@ -98,3 +98,13 @@ class TestWishlistServer(TestCase):
         self.assertEqual(resp["name"], test_product.name)
         # TBA
         # self.assertEqual(res["quanity"], test_product.quanity)
+
+    def test_create_product_wishlist_not_exist(self):
+        """It should report 404 error: wishlist not exist"""
+        response = self.client.post(
+            f"{BASE_URL}/0/products",
+            json={'name': 'Product', 'wishlist_id': 0}
+        )
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    

@@ -1,7 +1,7 @@
 """
 Wishlist Service
 
-Implementation of CRUD wishlists and products in the wishlists
+Wishlist service for shopping
 """
 
 from flask import jsonify, request, url_for, abort, make_response
@@ -20,22 +20,15 @@ BASE_URL = "/wishlists"
 @app.route("/")
 def index():
     """Root URL response"""
-    message = """
-    list_wishlists     GET      /wishlists
-    create_wishlists   POST     /wishlists
-    get_wishlists      GET      /wishlists/<wishlist_id>
-    update_wishlists   PUT      /wishlists/<wishlist_id>
-    delete_wishlists   DELETE   /wishlists/<wishlist_id>
-    list_products    GET      /wishlists/<wishlist_id>/products
-    create_products  POST     /wishlists/<wishlist_id>/products
-    get_products     GET      /wishlists/<wishlist_id>/products/<product_id>
-    update_products  PUT      /wishlists/<wishlist_id>/products/<product_id>
-    delete_products  DELETE   /wishlists/<wishlist_id>/products/<product_id>
-    """
-    response = make_response(message)
-    response.status = status.HTTP_200_OK
-    response.headers["Content-Type"] = "text/plain"
-    return response
+    return (
+        jsonify(
+            name="Wishlist Service",
+            version="1.0",
+            # later change to list_wishlist
+            paths=url_for("create_wishlist", _external=True),
+        ),
+        status.HTTP_200_OK
+    )
 
 
 ######################################################################
@@ -86,27 +79,30 @@ def create_products(wishlist_id):
     check_content_type("application/json")
 
     wishlist = Wishlist.find(wishlist_id)
-    if wishlist:
-        # Create the product
-        new_product = Product()
-        info = request.get_json()
-        new_product.deserialize(info)
-        new_product.wishlist = wishlist
-        new_product.create()
+    if not wishlist:
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"Wishlist {wishlist_id} not exist",
+        )
+    # Create the product
+    new_product = Product()
+    info = request.get_json()
+    new_product.deserialize(info)
+    new_product.wishlist = wishlist
+    new_product.create()
 
-        # Update wishlist_id if not consistent
-        if new_product.wishlist_id != wishlist_id:
-            new_product.wishlist_id = wishlist_id
-            new_product.update()
+    # Update wishlist_id if not consistent
+    if new_product.wishlist_id != wishlist_id:
+        new_product.wishlist_id = wishlist_id
+        new_product.update()
 
-        # wishlist.products.append(new_product)
-        wishlist.update()
+    # wishlist.products.append(new_product)
+    wishlist.update()
 
-        # Return response
-        message = new_product.serialize()
-        return make_response(jsonify(message), status.HTTP_201_CREATED)
-    else:
-        return make_response("Error: Wishlist not found", status.HTTP_404_NOT_FOUND)
+    # Return response
+    message = new_product.serialize()
+    return make_response(jsonify(message), status.HTTP_201_CREATED)
+
 
 
 ######################################################################
