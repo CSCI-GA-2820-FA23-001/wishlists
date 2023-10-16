@@ -130,6 +130,28 @@ def delete_products(wishlist_id, product_id):
     return make_response("", status.HTTP_204_NO_CONTENT)
 
 
+
+######################################################################
+# RETRIEVE A wishlist by id
+######################################################################
+@app.route(f"{BASE_URL}/<int:wishlist_id>", methods=["GET"])
+def get_wishlists(wishlist_id):
+    """
+    Retrieve a single Wishlist
+    This endpoint will return an Wishlist based on it's id
+    """
+    app.logger.info("Request for Wishlist with id: %s", wishlist_id)
+    # See if the wishlist exists and abort if it doesn't
+    wishlist = Wishlist.find(wishlist_id)
+    if not wishlist:
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"Wishlist with id '{wishlist_id}' could not be found.",
+        )
+    return wishlist.serialize(), status.HTTP_200_OK
+
+
+
 ######################################################################
 #  R E S T   A P I   E N D P O I N T S
 ######################################################################
