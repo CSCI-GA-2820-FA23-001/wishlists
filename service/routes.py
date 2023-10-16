@@ -130,6 +130,7 @@ def delete_products(wishlist_id, product_id):
     return make_response("", status.HTTP_204_NO_CONTENT)
 
 
+
 ######################################################################
 # RETRIEVE A wishlist by id
 ######################################################################
@@ -148,6 +149,7 @@ def get_wishlists(wishlist_id):
             f"Wishlist with id '{wishlist_id}' could not be found.",
         )
     return wishlist.serialize(), status.HTTP_200_OK
+
 
 
 ######################################################################

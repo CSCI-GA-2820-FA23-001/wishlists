@@ -95,6 +95,8 @@ class Product(db.Model, PersistentBase):
     Class that represents an Product
     """
 
+    __tablename__ = "product"
+
     # Table Schema
     id = db.Column(db.Integer, primary_key=True)
     wishlist_id = db.Column(
@@ -145,7 +147,9 @@ class Product(db.Model, PersistentBase):
 class Wishlist(db.Model, PersistentBase):
     """
     Class that represents an Wishlist
-    """
+    """    
+
+    __tablename__ = "wishlist"
 
     app = None
 
