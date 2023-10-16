@@ -10,9 +10,6 @@
 This repository contains code for Wishlists for an e-commerce web site. This shows how to create a REST API with subordinate resources like wishlists that have products:
 
 
-## Development environment setup
-
-Select the appropriate development environment setup. Most students should choose the first one using Docker and Visual Studio Code.
 
 ## Running the service locally
 
