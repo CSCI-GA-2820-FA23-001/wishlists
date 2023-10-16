@@ -85,7 +85,7 @@ class TestWishlistServer(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_get_wishlist(self):
-        """It should Get an Wishlist by Name"""
+        """It should Get an Wishlist by id"""
         wishlists = self._create_wishlists(3)
         # print(wishlists)
         resp = self.client.get(f"{BASE_URL}/{wishlists[1].id}")
