@@ -41,6 +41,7 @@ class TestWishlistServer(TestCase):
     def tearDown(self):
         """This runs after each test"""
         db.session.remove()
+
     ######################################################################
     #  HELPER FUNCTIONS
     ######################################################################
@@ -126,6 +127,30 @@ class TestWishlistServer(TestCase):
         products = test_wishlist.products
         self.assertIn(product, products)
 
+    def test_get_product_list(self):
+        """It should Get a list of Products"""
+        # add two products to wishlist
+        wishlist = self._create_wishlists(1)[0]
+        product_list = ProductFactory.create_batch(2)
+        # Create product 1
+        resp = self.client.post(
+            f"{BASE_URL}/{wishlist.id}/products", json=product_list[0].serialize()
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        # Create product 2
+        resp = self.client.post(
+            f"{BASE_URL}/{wishlist.id}/products", json=product_list[1].serialize()
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        # get the list back and make sure there are 2
+        resp = self.client.get(f"{BASE_URL}/{wishlist.id}/products")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+        data = resp.get_json()
+        self.assertEqual(len(data), 2)
+
     def test_get_product(self):
         """It should Get an product from an wishlist"""
         # create a known address
@@ -204,7 +229,6 @@ class TestWishlistServer(TestCase):
         resp = self.client.get(f"{BASE_URL}/0")
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
-
     def test_list_wishlist_without_owner(self):
         """It should Get a list of Accounts"""
         self._create_wishlists(5)
@@ -221,10 +245,9 @@ class TestWishlistServer(TestCase):
         data = resp.get_json()
         self.assertEqual(data[0]["owner"], wishlists[1].owner)
 
-
-######################################################################
-#  E R R O R    H A N D L E R   T E S T
-######################################################################
+    ######################################################################
+    #  E R R O R    H A N D L E R   T E S T
+    ######################################################################
     def test_bad_request(self):
         """It should not Create when sending the wrong data"""
         resp = self.client.post(BASE_URL, json={"name": "not enough data"})
@@ -237,9 +260,8 @@ class TestWishlistServer(TestCase):
             BASE_URL, json=wishlist.serialize(), content_type="test/html"
         )
         self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
-    
+
     def test_method_not_allowed(self):
         """It should not allow an illegal method call"""
         resp = self.client.put(BASE_URL, json={"not": "today"})
         self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
-
