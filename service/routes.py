@@ -24,8 +24,7 @@ def index():
         jsonify(
             name="Wishlist Service",
             version="1.0",
-            # later change to list_wishlist
-            paths=url_for("create_wishlist", _external=True),
+            paths=url_for("list_wishlists", _external=True),
         ),
         status.HTTP_200_OK,
     )
