@@ -37,7 +37,8 @@ wishlist = {
 product = {
             "id": Int,
             "wishlist_id": Int,
-            "name": String
+            "name": String,
+            "quantity": Int
         }
 ```
 
