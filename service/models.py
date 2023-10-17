@@ -42,7 +42,7 @@ class PersistentBase:
 
     def create(self):
         """
-        Creates a Wishlist to the database
+        Creates an object to the database
         """
         logger.info("Creating %s", self.name)
         self.id = None  # id must be none to generate next primary key
@@ -51,7 +51,7 @@ class PersistentBase:
 
     def update(self):
         """
-        Updates a Wishlist to the database
+        Updates an object to the database
         """
         logger.info("Updating %s", self.name)
         if not self.id:
@@ -59,7 +59,7 @@ class PersistentBase:
         db.session.commit()
 
     def delete(self):
-        """Removes a Wishlist from the data store"""
+        """Removes an object from the data store"""
         logger.info("Deleting %s", self.name)
         db.session.delete(self)
         db.session.commit()
@@ -103,9 +103,10 @@ class Product(db.Model, PersistentBase):
         db.Integer, db.ForeignKey("wishlist.id", ondelete="CASCADE"), nullable=False
     )
     name = db.Column(db.String(64))
+    quantity = db.Column(db.Integer)
 
     def __repr__(self):
-        return f"<Product {self.name} id=[{self.id}] wishlist[{self.wishlist_id}]>"
+        return f"<Product {self.name} id=[{self.id}] quantity={self.quantity} wishlist[{self.wishlist_id}]>"
 
     def __str__(self):
         return f"{self.name}:"
@@ -116,6 +117,7 @@ class Product(db.Model, PersistentBase):
             "id": self.id,
             "wishlist_id": self.wishlist_id,
             "name": self.name,
+            "quantity": self.quantity,
         }
 
     def deserialize(self, data: dict) -> None:
@@ -128,6 +130,7 @@ class Product(db.Model, PersistentBase):
         try:
             self.wishlist_id = data["wishlist_id"]
             self.name = data["name"]
+            self.quantity = data["quantity"]
 
         except KeyError as error:
             raise DataValidationError(
@@ -147,7 +150,7 @@ class Product(db.Model, PersistentBase):
 class Wishlist(db.Model, PersistentBase):
     """
     Class that represents an Wishlist
-    """    
+    """
 
     __tablename__ = "wishlist"
 
@@ -212,7 +215,7 @@ class Wishlist(db.Model, PersistentBase):
             name (string): the name of the Wishlists you want to match
         """
         logger.info("Processing name query for %s ...", name)
-        return cls.query.filter(cls.name == name)    
+        return cls.query.filter(cls.name == name)
 
     @classmethod
     def find_by_owner(cls, owner):

@@ -219,6 +219,7 @@ class TestWishlist(unittest.TestCase):
         new_wishlist = Wishlist.find(wishlist.id)
         self.assertEqual(len(new_wishlist.products), 2)
         self.assertEqual(new_wishlist.products[1].name, product2.name)
+        self.assertEqual(new_wishlist.products[1].quantity, product2.quantity)
 
     def test_update_wishlist_product(self):
         """It should Update an wishlists product"""
@@ -240,12 +241,14 @@ class TestWishlist(unittest.TestCase):
         self.assertEqual(old_product.name, product.name)
         # Change the city
         old_product.name = "XX"
+        old_product.quantity = 233
         wishlist.update()
 
         # Fetch it back again
         wishlist = Wishlist.find(wishlist.id)
         product = wishlist.products[0]
         self.assertEqual(product.name, "XX")
+        self.assertEqual(product.quantity, 233)
 
     def test_delete_wishlist_product(self):
         """It should Delete an wishlists product"""
