@@ -151,6 +151,34 @@ class TestWishlistServer(TestCase):
         data = resp.get_json()
         self.assertEqual(len(data), 2)
 
+    def test_get_product(self):
+        """It should Get an product from an wishlist"""
+        # create a known address
+        test_wishlist = self._create_wishlists(1)[0]
+        test_product = ProductFactory()
+        resp = self.client.post(
+            f"{BASE_URL}/{test_wishlist.id}/products", 
+            json=test_product.serialize(),
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        data = resp.get_json()
+        logging.debug(data)
+        product_id = data["id"]
+
+        # retrieve it back
+        resp = self.client.get(
+            f"{BASE_URL}/{test_wishlist.id}/products/{product_id}",
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+        data = resp.get_json()
+        logging.debug(data)
+        self.assertEqual(data["wishlist_id"], test_wishlist.id)
+        self.assertEqual(data["name"], test_product.name)
+
     def test_create_product_wishlist_not_exist(self):
         """It should report 404 error: wishlist not exist when creating products"""
         response = self.client.post(

@@ -125,6 +125,30 @@ def create_products(wishlist_id):
     message = new_product.serialize()
     return make_response(jsonify(message), status.HTTP_201_CREATED)
 
+######################################################################
+# RETRIEVE a product in the wishlist
+######################################################################
+@app.route(
+    f"{BASE_URL}/<int:wishlist_id>/products/<int:product_id>", methods=["GET"]
+)
+def get_product(wishlist_id, product_id):
+    """
+    Get an product
+
+    This endpoint returns just an product
+    """
+    app.logger.info("Request to retrieve product %s in wishilist id: %s", (product_id, wishlist_id))
+
+    # See if the product exists and abort if it doesn't
+    product = Product.find(product_id)
+    if not product:
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"Product with id '{product_id}' could not be found.",
+        )
+
+    return make_response(jsonify(product.serialize()), status.HTTP_200_OK)
+
 
 ######################################################################
 #  DELETE a product in the wishlist
