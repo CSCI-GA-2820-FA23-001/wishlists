@@ -137,7 +137,7 @@ def get_product(wishlist_id, product_id):
     This endpoint returns just an product
     """
     app.logger.info(
-        "Request to retrieve product %s in wishilist id: %s", (product_id, wishlist_id)
+        "Request to retrieve product %s in wishlist id: %s", (product_id, wishlist_id)
     )
 
     # See if the product exists and abort if it doesn't
@@ -147,6 +147,54 @@ def get_product(wishlist_id, product_id):
             status.HTTP_404_NOT_FOUND,
             f"Product with id '{product_id}' could not be found.",
         )
+
+    return make_response(jsonify(product.serialize()), status.HTTP_200_OK)
+
+
+######################################################################
+# UPDATE a product in the wishlist
+######################################################################
+@app.route(f"{BASE_URL}/<int:wishlist_id>/products/<int:product_id>", methods=["PUT"])
+def update_product(wishlist_id, product_id):
+    """
+    Update an product
+
+    This endpoint will update the name and quantity of a product based given id
+    """
+    app.logger.info(
+        "Request to update Product %d in Wishlist id: %d", product_id, wishlist_id
+    )
+    check_content_type("application/json")
+
+    # check the wishlist
+    wishlist = Wishlist.find(wishlist_id)
+    if not wishlist:
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"Wishlist with id {wishlist_id} not exist",
+        )
+    # check the product
+    product = Product.find(product_id)
+    if not product:
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"Product with id '{product_id}' not exist",
+        )
+    # check if the wishlist contains the product
+    if product not in wishlist.products:
+        abort(
+            status.HTTP_400_BAD_REQUEST,
+            f"Wishlist {wishlist_id} does not contain Product {product_id}",
+        )
+
+    data = request.get_json()
+    if data["wishlist_id"] != wishlist_id:
+        abort(
+            status.HTTP_409_CONFLICT,
+            "Should not change the wishlist a product belongs to",
+        )
+    product.deserialize(request.get_json())
+    product.update()
 
     return make_response(jsonify(product.serialize()), status.HTTP_200_OK)
 
