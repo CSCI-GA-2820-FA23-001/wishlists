@@ -267,6 +267,34 @@ def list_products(wishlist_id):
 
 
 ######################################################################
+# UPDATE AN EXISTING Wishlist
+######################################################################
+@app.route("/wishlists/<int:wishlist_id>", methods=["PUT"])
+def update_wishlists_by_name(wishlist_id):
+    """
+    Update an Wishlist
+    This endpoint will update an Wishlist based the body that is posted
+    """
+    app.logger.info("Request to update wishlist with id: %s", wishlist_id)
+    check_content_type("application/json")
+
+    # See if the wishlist exists and abort if it doesn't
+    wishlist = Wishlist.find(wishlist_id)
+    if not wishlist:
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"Wishlist with id '{wishlist_id}' was not found.",
+        )
+    # Update from the json in the body of the request
+    wishlist.deserialize(request.get_json())
+    wishlist.id = wishlist_id
+    # wishlist.name = newname
+    wishlist.update()
+
+    return make_response(jsonify(wishlist.serialize()), status.HTTP_200_OK)
+
+
+######################################################################
 #  R E S T   A P I   E N D P O I N T S
 ######################################################################
 

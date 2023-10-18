@@ -284,7 +284,7 @@ class TestWishlistServer(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_list_wishlist_without_owner(self):
-        """It should Get a list of Accounts"""
+        """It should Get a list of wishlists"""
         self._create_wishlists(5)
         resp = self.client.get(BASE_URL)
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
@@ -292,12 +292,46 @@ class TestWishlistServer(TestCase):
         self.assertEqual(len(data), 5)
 
     def test_list_wishlist_by_owner(self):
-        """It should Get an Account by Name"""
+        """It should Get an wishlist by Name"""
         wishlists = self._create_wishlists(3)
         resp = self.client.get(BASE_URL, query_string=f"owner={wishlists[1].owner}")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = resp.get_json()
         self.assertEqual(data[0]["owner"], wishlists[1].owner)
+
+    # def test_update_wishlist_by_name(self):
+    #     """It should Update an existing Wishlist"""
+    #     # create an Wishlist to update
+    #     test_wishlist = WishlistFactory()
+    #     resp = self.client.post(BASE_URL, json=test_wishlist.serialize())
+    #     self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+    #     # update the pet
+    #     new_wishlist = resp.get_json()
+    #     new_name = "Happy-Happy Joy-Joy"
+    #     new_wishlist["name"] = "Happy-Happy Joy-Joy"
+    #     new_wishlist_id = new_wishlist["id"]
+    #     resp = self.client.put(
+    #         f"{BASE_URL}/{new_wishlist_id}/{new_name}", json=new_wishlist
+    #     )
+    #     self.assertEqual(resp.status_code, status.HTTP_200_OK)
+    #     updated_wishlist = resp.get_json()
+    #     self.assertEqual(updated_wishlist["name"], "Happy-Happy Joy-Joy")
+    def test_update_wishlist(self):
+        """It should Update an existing Wishlist"""
+        # create an Wishlist to update
+        test_wishlist = WishlistFactory()
+        resp = self.client.post(BASE_URL, json=test_wishlist.serialize())
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        # update the pet
+        new_wishlist = resp.get_json()
+        new_wishlist["name"] = "nyu-wishlist"
+        new_wishlist_id = new_wishlist["id"]
+        resp = self.client.put(f"{BASE_URL}/{new_wishlist_id}", json=new_wishlist)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        updated_wishlist = resp.get_json()
+        self.assertEqual(updated_wishlist["name"], "nyu-wishlist")
 
     ######################################################################
     #  E R R O R    H A N D L E R   T E S T
