@@ -16,11 +16,7 @@ jobs:
     services:
       postgres:
         image: postgres
-        env:
-          POSTGRES_PASSWORD: pgs3cr3t
-          POSTGRES_DB: testdb
-        ports:
-          - 5432:5432
+      
         # Set health checks to wait until postgres has started
         options: >-
           --health-cmd pg_isready
@@ -56,7 +52,7 @@ jobs:
       #   run: pytest --pspec --cov=service --cov-fail-under=95
       #   env:
       #     DATABASE_URI: "redis://redis:6379"
-      - name: Run unit tests with nose
+      - name: Run unit tests with green
         run: |
           # export FLASK_APP=service:app
           green -vvv --processes=1 --run-coverage --termcolor --minimum-coverage=95
