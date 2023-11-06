@@ -63,7 +63,9 @@ def create_wishlist():
     new_list.create()
     message = new_list.serialize()
 
-    return make_response(jsonify(message), status.HTTP_201_CREATED)
+    location_url = url_for("get_wishlists", wishlist_id=new_list.id, _external=True)
+
+    return jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
 
 
 ######################################################################
