@@ -186,6 +186,55 @@ class TestWishlist(unittest.TestCase):
         wishlist = Wishlist()
         self.assertRaises(DataValidationError, wishlist.deserialize, [])
 
+    def test_update_no_id(self):
+        """It should not Update a wishlist with no id"""
+        wishlist = WishlistFactory()
+        logging.debug(wishlist)
+        wishlist.id = None
+        self.assertRaises(DataValidationError, wishlist.update)
+
+    def test_deserialize_missing_data(self):
+        """It should not deserialize a Pet with missing data (date_join)"""
+        data = {"id": 1, "name": "list", "owner": "chris", "products": []}
+        wishlist = Wishlist()
+        self.assertRaises(DataValidationError, wishlist.deserialize, data)
+
+    def test_deserialize_bad_data(self):
+        """It should not deserialize bad data"""
+        data = "this is not a dictionary"
+        wishlist = Wishlist()
+        self.assertRaises(DataValidationError, wishlist.deserialize, data)
+
+
+class TestProduct(unittest.TestCase):
+    """Test Cases for Wishlist Model"""
+
+    @classmethod
+    def setUpClass(cls):
+        """This runs once before the entire test suite"""
+        app.config["TESTING"] = True
+        app.config["DEBUG"] = False
+        app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URI
+        app.logger.setLevel(logging.CRITICAL)
+        Wishlist.init_db(app)
+
+    @classmethod
+    def tearDownClass(cls):
+        """This runs once after the entire test suite"""
+
+    def setUp(self):
+        """This runs before each test"""
+        db.session.query(Wishlist).delete()  # clean up the last tests
+        db.session.query(Product).delete()  # clean up the last tests
+        db.session.commit()
+
+    def tearDown(self):
+        """This runs after each test"""
+        db.session.remove()
+
+    ######################################################################
+    #  T E S T   C A S E S
+    ######################################################################
     def test_deserialize_product_key_error(self):
         """It should not Deserialize an product with a KeyError"""
         product = Product()
@@ -286,22 +335,3 @@ class TestWishlist(unittest.TestCase):
             str(wishlist), f"<Wishlist {wishlist.name} id=[{wishlist.id}]>"
         )
         self.assertEqual(str(product), f"{product.name}:")
-
-    def test_update_no_id(self):
-        """It should not Update a wishlist with no id"""
-        wishlist = WishlistFactory()
-        logging.debug(wishlist)
-        wishlist.id = None
-        self.assertRaises(DataValidationError, wishlist.update)
-
-    def test_deserialize_missing_data(self):
-        """It should not deserialize a Pet with missing data (date_join)"""
-        data = {"id": 1, "name": "list", "owner": "chris", "products": []}
-        wishlist = Wishlist()
-        self.assertRaises(DataValidationError, wishlist.deserialize, data)
-
-    def test_deserialize_bad_data(self):
-        """It should not deserialize bad data"""
-        data = "this is not a dictionary"
-        wishlist = Wishlist()
-        self.assertRaises(DataValidationError, wishlist.deserialize, data)
