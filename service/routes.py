@@ -37,7 +37,6 @@ def index():
 def list_wishlists():
     """Returns all of the wishlists"""
     app.logger.info("Request for listing all wishlists")
-    wishlists = []
 
     # Process the query string if any
     owner = request.args.get("owner")
