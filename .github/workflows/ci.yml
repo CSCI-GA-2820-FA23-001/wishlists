@@ -59,7 +59,7 @@ jobs:
       - name: Run unit tests with nose
         run: |
           export FLASK_APP=service:app
-          nosetests
+          green -vvv --processes=1 --run-coverage --termcolor --minimum-coverage=95
         env:
           DATABASE_URI: "postgresql://postgres:postgres@postgres:5432/postgres"
 
