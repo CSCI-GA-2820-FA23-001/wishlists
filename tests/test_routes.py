@@ -337,7 +337,7 @@ class TestWishlistServer(TestCase):
         """It should copy an existing Wishlist"""
         wishlists = self._create_wishlists(1)
         old_wishlist = wishlists[0]
-        test_product = self._create_products(old_wishlist.id, 2)[0]
+        self._create_products(old_wishlist.id, 2)
 
         resp = self.client.post(f"{BASE_URL}/{old_wishlist.id}/copy")
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
