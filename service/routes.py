@@ -3,10 +3,11 @@ Wishlist Service
 
 Wishlist service for shopping
 """
-
+from datetime import date
 from flask import jsonify, request, url_for, abort, make_response
 from service.common import status  # HTTP Status Codes
 from service.models import Product, Wishlist
+
 
 # Import Flask application
 from . import app
@@ -301,6 +302,47 @@ def update_wishlists_by_name(wishlist_id):
     wishlist.update()
 
     return make_response(jsonify(wishlist.serialize()), status.HTTP_200_OK)
+
+
+######################################################################
+# COPY AN EXISTING Wishlist
+######################################################################
+@app.route(f"{BASE_URL}/<int:wishlist_id>/copy", methods=["POST"])
+def copy_wishlist_by_id(wishlist_id):
+    """
+    COPY AN EXISTING Wishlist with an id
+    """
+    old = Wishlist.find(wishlist_id).serialize()
+    if not old:
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"Wishlist {wishlist_id} not exist",
+        )
+
+    new = {}
+    for key, val in old.items():
+        if key not in ["id", "name", "products"]:
+            new[key] = val
+    new["name"] = old["name"] + " COPY"
+    new["products"] = []
+    new["date_joined"] = str(date.today())
+    new_list = Wishlist()
+    new_list.deserialize(new)
+    new_list.create()
+
+    for product in old["products"]:
+        product["wishlist_id"] = new_list.id
+        new_product = Product()
+        new_product.deserialize(product)
+        new_product.create()
+
+    location_url = url_for("get_wishlists", wishlist_id=new_list.id, _external=True)
+
+    return make_response(
+        jsonify(new_list.serialize()),
+        status.HTTP_201_CREATED,
+        {"Location": location_url},
+    )
 
 
 ######################################################################
