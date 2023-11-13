@@ -57,14 +57,14 @@ get_wishlists      GET      /wishlists/<wishlist_id>
 update_wishlists   PUT      /wishlists/<wishlist_id>
 delete_wishlists   DELETE   /wishlists/<wishlist_id>
 
-list_products      GET      /wishlists/<int:wishlist_id>/products
+list_products      GET      /wishlists/<wishlist_id>/products
 create_products    POST     /wishlists/<wishlist_id>/products
 get_products       GET      /wishlists/<wishlist_id>/products/<product_id>
 update_products    PUT      /wishlists/<wishlist_id>/products/<product_id>
 delete_products    DELETE   /wishlists/<wishlist_id>/products/<product_id>
 ```
 <!-- 
-The test cases have 95% test coverage and can be run with `nosetests` -->
+The test cases have 95% test coverage and can be run with `make test` -->
 
 
 
