@@ -8,11 +8,12 @@ Test cases can be run with the following:
 # import os
 import logging
 from unittest import TestCase
+from datetime import date
 from service import app
 from service.models import db, Wishlist, Product
 from service.common import status  # HTTP Status Codes
 from tests.factories import WishlistFactory, ProductFactory
-from datetime import date
+
 
 BASE_URL = "/wishlists"
 
