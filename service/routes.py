@@ -3,7 +3,7 @@ Wishlist Service
 
 Wishlist service for shopping
 """
-from datetime import date
+from datetime import date, datetime
 from flask import jsonify, request, url_for, abort, make_response
 from service.common import status  # HTTP Status Codes
 from service.models import Product, Wishlist
@@ -36,8 +36,12 @@ def index():
 ######################################################################
 @app.route(BASE_URL, methods=["GET"])
 def list_wishlists():
-    """Returns all of the wishlists"""
+    """Returns all of the wishlists. If there is a date filter, return filtered wishlists"""
     app.logger.info("Request for listing all wishlists")
+
+    # Get query args: start date and end date
+    start = request.args.get("start")
+    end = request.args.get("end")
 
     # Process the query string if any
     owner = request.args.get("owner")
@@ -46,8 +50,27 @@ def list_wishlists():
     else:
         accounts = Wishlist.all()
 
-    # Return as an array of dictionaries
-    results = [account.serialize() for account in accounts]
+    if not start:
+        if not end:
+            # Return as an array of dictionaries
+            results = [account.serialize() for account in accounts]
+            return make_response(jsonify(results), status.HTTP_200_OK)
+        else:
+            start_date = date(1000, 1, 1)
+            end_date = datetime.strptime(end, "%Y-%m-%d").date()
+    else:
+        start_date = datetime.strptime(start, "%Y-%m-%d").date()
+        if not end:
+            end_date = date(3000, 1, 1)
+        else:
+            end_date = datetime.strptime(end, "%Y-%m-%d").date()
+
+    # filter by start and end date
+    results = []
+    for account in accounts:
+        date_joined = account.date_joined
+        if date_joined >= start_date and date_joined <= end_date:
+            results.append(account.serialize())
 
     return make_response(jsonify(results), status.HTTP_200_OK)
 
