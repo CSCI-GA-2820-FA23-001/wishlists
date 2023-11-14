@@ -39,38 +39,30 @@ def list_wishlists():
     """Returns all of the wishlists. If there is a date filter, return filtered wishlists"""
     app.logger.info("Request for listing all wishlists")
 
-    # Get query args: start date and end date
+    # Get query args
+    owner = request.args.get("owner")
     start = request.args.get("start")
     end = request.args.get("end")
 
     # Process the query string if any
-    owner = request.args.get("owner")
+
     if owner:
         accounts = Wishlist.find_by_owner(owner)
+    elif start or end:
+        # filter by start and end date
+        if start:
+            start_date = datetime.strptime(start, "%Y-%m-%d").date()
+        else:
+            start_date = date(1000, 1, 1)
+        if end:
+            end_date = datetime.strptime(end, "%Y-%m-%d").date()
+        else:
+            end_date = date(3000, 1, 1)
+        accounts = Wishlist.filter_by_date(start_date, end_date)
     else:
         accounts = Wishlist.all()
 
-    if not start:
-        if not end:
-            # Return as an array of dictionaries
-            results = [account.serialize() for account in accounts]
-            return make_response(jsonify(results), status.HTTP_200_OK)
-        start_date = date(1000, 1, 1)
-        end_date = datetime.strptime(end, "%Y-%m-%d").date()
-    else:
-        start_date = datetime.strptime(start, "%Y-%m-%d").date()
-        if not end:
-            end_date = date(3000, 1, 1)
-        else:
-            end_date = datetime.strptime(end, "%Y-%m-%d").date()
-
-    # filter by start and end date
-    results = []
-    for account in accounts:
-        date_joined = account.date_joined
-        if start_date <= date_joined <= end_date:
-            results.append(account.serialize())
-
+    results = [account.serialize() for account in accounts]
     return make_response(jsonify(results), status.HTTP_200_OK)
 
 

@@ -5,6 +5,7 @@ Test cases for Wishlist Model
 import logging
 import unittest
 import os
+from datetime import date
 from service import app
 from service.models import Wishlist, Product, DataValidationError, db
 from tests.factories import WishlistFactory, ProductFactory
@@ -204,6 +205,18 @@ class TestWishlist(unittest.TestCase):
         data = "this is not a dictionary"
         wishlist = Wishlist()
         self.assertRaises(DataValidationError, wishlist.deserialize, data)
+
+    def test_filter_by_date(self):
+        """It should return wishlists filter by the date"""
+        wishlist = WishlistFactory()
+        wishlist.create()
+        wishlist.date_joined = date(2000, 1, 1)
+        date1 = date(1999, 1, 1)
+        date2 = date(2001, 1, 1)
+        date3 = date(2002, 1, 1)
+        self.assertEqual(wishlist.id, Wishlist.filter_by_date(date1, date2)[0].id)
+        self.assertEqual([], Wishlist.filter_by_date(date2, date3).all())
+        self.assertRaises(DataValidationError, Wishlist.filter_by_date, date2, date1)
 
 
 class TestProduct(unittest.TestCase):
