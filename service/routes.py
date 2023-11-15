@@ -50,14 +50,12 @@ def list_wishlists():
         accounts = Wishlist.find_by_owner(owner)
     elif start or end:
         # filter by start and end date
+        start_date = None
+        end_date = None
         if start:
             start_date = datetime.strptime(start, "%Y-%m-%d").date()
-        else:
-            start_date = date(1000, 1, 1)
         if end:
             end_date = datetime.strptime(end, "%Y-%m-%d").date()
-        else:
-            end_date = date(3000, 1, 1)
         accounts = Wishlist.filter_by_date(start_date, end_date)
     else:
         accounts = Wishlist.all()

@@ -235,7 +235,7 @@ class Wishlist(db.Model, PersistentBase):
         return cls.query.get(by_id)
 
     @classmethod
-    def filter_by_date(cls, start, end):
+    def filter_by_date(cls, start=None, end=None):
         """Return all wishlists filtered by the date
 
         Args:
@@ -243,8 +243,16 @@ class Wishlist(db.Model, PersistentBase):
             end (date): end date
         """
         logger.info("Processing date filter for date between %s and %s", start, end)
-        if start > end:
-            raise DataValidationError(
-                "Invalid Date: start date should be smaller than end date"
+        if start and end:
+            if start > end:
+                raise DataValidationError(
+                    "Invalid Date: start date should be smaller than end date"
+                )
+            return cls.query.filter(
+                and_(cls.date_joined <= end, cls.date_joined >= start)
             )
-        return cls.query.filter(and_(cls.date_joined <= end, cls.date_joined >= start))
+        if start:
+            return cls.query.filter(cls.date_joined >= start)
+        if end:
+            return cls.query.filter(cls.date_joined <= end)
+        return cls.all()
