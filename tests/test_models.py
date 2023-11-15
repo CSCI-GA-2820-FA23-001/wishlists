@@ -217,6 +217,7 @@ class TestWishlist(unittest.TestCase):
         self.assertEqual(wishlist.id, Wishlist.filter_by_date(date1, date2)[0].id)
         self.assertEqual(wishlist.id, Wishlist.filter_by_date(start=date1)[0].id)
         self.assertEqual(wishlist.id, Wishlist.filter_by_date(end=date2)[0].id)
+        self.assertEqual(wishlist.id, Wishlist.filter_by_date()[0].id)
         self.assertEqual([], Wishlist.filter_by_date(date2, date3).all())
         self.assertRaises(DataValidationError, Wishlist.filter_by_date, date2, date1)
 
