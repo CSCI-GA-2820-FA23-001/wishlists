@@ -27,7 +27,7 @@
 				"ms-python.pylint",
 				"ms-python.vscode-pylance",
 				"ms-python.black-formatter",
-				// "alexkrechik.cucumberautocomplete",
+				"alexkrechik.cucumberautocomplete",
 				"cstrap.flask-snippets",
 				"yzhang.markdown-all-in-one",
 				"bierner.github-markdown-preview",
@@ -49,7 +49,7 @@
 			]	
 		}
 	},
-	//"postCreateCommand": "",
+	"postCreateCommand": "bash /app/.devcontainer/scripts/setup-lab.sh",
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// "forwardPorts": 8080,
