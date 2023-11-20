@@ -9,8 +9,8 @@ spec:
   strategy:
     type: RollingUpdate
     rollingUpdate:
-      maxSurge: 2
-      maxUnavailable: 0  
+      maxSurge: 0%
+      maxUnavailable: 50%
   selector:
     matchLabels:
       app: wishlist
@@ -19,6 +19,8 @@ spec:
       labels:
         app: wishlist
     spec:
+      imagePullSecrets:
+      - name: all-icr-io
       restartPolicy: Always
       containers:
       - name: wishlist
@@ -44,8 +46,8 @@ spec:
             port: 8080
         resources:
           limits:
-            cpu: "0.50"
+            cpu: "0.20"
             memory: "128Mi"
           requests:
-            cpu: "0.25"
+            cpu: "0.10"
             memory: "64Mi"
