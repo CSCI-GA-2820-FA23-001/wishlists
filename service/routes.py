@@ -282,7 +282,7 @@ def update_product(wishlist_id, product_id):
         )
 
     data = request.get_json()
-    if data["wishlist_id"] != wishlist_id:
+    if data["wishlist_id"] != str(wishlist_id):
         abort(
             status.HTTP_409_CONFLICT,
             "Should not change the wishlist a product belongs to",

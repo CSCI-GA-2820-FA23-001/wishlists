@@ -225,4 +225,201 @@ $(function () {
         $("#flash_message").empty();
         clear_form_data()
     });
+
+    // ****************************************
+    //  U T I L I T Y   F U N C T I O N S
+    // ****************************************
+
+    // Updates the form with data from the response
+    function update_product_form_data(res) {
+        $("#product_id").val(res.id);
+        $("#product_name").val(res.name);
+        $("#product_wishlist_id").val(res.wishlist_id);
+        $("#product_quantity").val(res.quantity);
+    }
+
+    /// Clears all form fields
+    function clear_product_form_data() {
+        $("#product_id").val("");
+        $("#product_name").val("");
+        $("#product_quantity").val("");
+    }
+
+    // ****************************************
+    // List All Products
+    // ****************************************
+
+    $("#product-list-btn").click(function () {
+        let wishlist_id = $("#product_wishlist_id").val();
+
+        $("#flash_message").empty();
+        
+        let ajax = $.ajax({
+            type: "GET",
+            url: `/wishlists/${wishlist_id}/products`,
+            contentType: "application/json",
+            data: "",
+        });
+        
+        ajax.done(function(res){
+            $("#product_table_body").empty();
+            let tableContent = "";
+            res.forEach(function(products) {
+                tableContent += `<tr>
+                                    <td>${products.id}</td>
+                                    <td>${products.wishlist_id}</td>
+                                    <td>${products.name}</td>
+                                    <td>${products.quantity}</td>
+                                </tr>`;
+            });
+            $("#product_table_body").append(tableContent);
+            flash_message("Products retrieved successfully");
+        });
+
+        ajax.fail(function(res){
+            flash_message("Failed to retrieve products: " + res.responseJSON.message);
+        });
+    });
+
+    // ****************************************
+    // Create a Product
+    // ****************************************
+
+    $("#product-create-btn").click(function () {
+        let product_id = $("#product_id").val();
+        let wishlist_id = $("#product_wishlist_id").val();
+        let name = $("#product_name").val();
+        let quantity = $("#product_quantity").val();
+
+        $("#flash_message").empty();
+
+        let data = {
+            "id": product_id,
+            "wishlist_id": wishlist_id,
+            "name": name,
+            "quantity": quantity
+        };
+
+        $("#flash_message").empty();
+        
+        let ajax = $.ajax({
+            type: "POST",
+            url: `/wishlists/${wishlist_id}/products`,
+            contentType: "application/json",
+            data: JSON.stringify(data),
+        });
+
+        ajax.done(function(res){
+            update_product_form_data(res)
+            flash_message("Product create Success")
+        });
+
+        // ajax.fail(function(res){
+        //     flash_message(res.responseJSON.message)
+        // });
+    });
+
+    // ****************************************
+    // Update a Product
+    // ****************************************
+
+    $("#product-update-btn").click(function () {
+        let product_id = $("#product_id").val();
+        let wishlist_id = $("#product_wishlist_id").val();
+        let name = $("#product_name").val();
+        let quantity = $("#product_quantity").val();
+
+        let data = {
+            "id": product_id,
+            "wishlist_id": wishlist_id,
+            "name": name,
+            "quantity": quantity
+        };
+
+        $("#flash_message").empty();
+
+        let ajax = $.ajax({
+                type: "PUT",
+                url: `/wishlists/${wishlist_id}/products/${product_id}`,
+                contentType: "application/json",
+                data: JSON.stringify(data)
+            })
+
+        ajax.done(function(res){
+            update_product_form_data(res)
+            flash_message("Product update Success")
+        });
+
+        ajax.fail(function(res){
+            flash_message(res.responseJSON.message)
+        });
+
+    });
+
+    // ****************************************
+    // Retrieve a Product
+    // ****************************************
+
+    $("#product-retrieve-btn").click(function () {
+        let product_id = $("#product_id").val();
+        let wishlist_id = $("#product_wishlist_id").val();
+
+        $("#flash_message").empty();
+
+        let ajax = $.ajax({
+            type: "GET",
+            url: `/wishlists/${wishlist_id}/products/${product_id}`,
+            contentType: "application/json",
+            data: ''
+        })
+
+        ajax.done(function(res){
+            //alert(res.toSource())
+            update_product_form_data(res)
+            flash_message("Retrieve product Success")
+        });
+
+        ajax.fail(function(res){
+            clear_form_data()
+            flash_message(res.responseJSON.message)
+        });
+
+    });
+
+    // ****************************************
+    // Delete a Product
+    // ****************************************
+
+    $("#product-delete-btn").click(function () {
+        let product_id = $("#product_id").val();
+        let wishlist_id = $("#product_wishlist_id").val();
+
+        $("#flash_message").empty();
+
+        let ajax = $.ajax({
+            type: "DELETE",
+            url: `/wishlists/${wishlist_id}/products/${product_id}`,
+            contentType: "application/json",
+            data: '',
+        })
+
+        ajax.done(function(res){
+            clear_product_form_data()
+            flash_message("Products has been Deleted!")
+        });
+
+        ajax.fail(function(res){
+            flash_message("Server error!")
+        });
+    });
+
+    // ****************************************
+    // Clear the form
+    // ****************************************
+
+    $("#product-clear-btn").click(function () {
+        $("#product_wishlist_id").val("");
+        $("#flash_message").empty();
+        clear_product_form_data()
+    });
 })
