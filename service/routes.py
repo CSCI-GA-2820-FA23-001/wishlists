@@ -13,6 +13,15 @@ from service.models import Product, Wishlist
 from . import app
 
 BASE_URL = "/wishlists"
+############################################################
+# Health Endpoint
+############################################################
+
+
+@app.route("/health")
+def health():
+    """Health Status"""
+    return (jsonify(status="OK"), status.HTTP_200_OK)
 
 
 ######################################################################
@@ -231,7 +240,8 @@ def get_product(wishlist_id, product_id):
     This endpoint returns just an product
     """
     app.logger.info(
-        "Request to retrieve product %s in wishlist id: %s", product_id, wishlist_id
+        "Request to update Product %d in Wishlist id: %d", product_id, wishlist_id
+
     )
 
     # See if the product exists and abort if it doesn't
