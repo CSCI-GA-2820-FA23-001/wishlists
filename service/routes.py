@@ -12,6 +12,15 @@ from service.models import Product, Wishlist
 from . import app
 
 BASE_URL = "/wishlists"
+############################################################
+# Health Endpoint
+############################################################
+
+
+@app.route("/health")
+def health():
+    """Health Status"""
+    return jsonify(dict(status="OK")), status.HTTP_200_OK
 
 
 ######################################################################
