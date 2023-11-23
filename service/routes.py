@@ -20,7 +20,7 @@ BASE_URL = "/wishlists"
 @app.route("/health")
 def health():
     """Health Status"""
-    return jsonify(dict(status="OK")), status.HTTP_200_OK
+    return (jsonify(status="OK"), status.HTTP_200_OK)
 
 
 ######################################################################
@@ -154,7 +154,7 @@ def get_product(wishlist_id, product_id):
     This endpoint returns just an product
     """
     app.logger.info(
-        "Request to retrieve product %d in wishlist id: %d", (product_id, wishlist_id)
+        "Request to update Product %d in Wishlist id: %d", product_id, wishlist_id
     )
 
     # See if the product exists and abort if it doesn't
