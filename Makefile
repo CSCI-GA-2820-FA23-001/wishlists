@@ -44,7 +44,7 @@ run: ## Run the service
 .PHONY: cluster
 cluster: ## Create a K3D Kubernetes cluster with load balancer and registry
 	$(info Creating Kubernetes cluster with a registry and 1 node...)
-	k3d cluster create --agents 1 --registry-create cluster-registry:0.0.0.0:32000 --port '8080:80@loadbalancer'
+	k3d cluster create devops --agents 1 --registry-create cluster-registry:0.0.0.0:32000 --port '8080:80@loadbalancer'
 
 .PHONY: cluster-rm
 cluster-rm: ## Remove a K3D Kubernetes cluster
@@ -63,5 +63,8 @@ login: ## Login to IBM Cloud using yur api key
 .PHONY: deploy
 depoy: ## Deploy the service on local Kubernetes
 	$(info Deploying service locally...)
-	kubectl apply -f deploy/
+	docker build -t wishlist:1.0 .
+	docker tag wishlist:1.0 cluster-registry:32000/wishlist:1.0
+	docker push cluster-registry:32000/wishlist:1.0
+	kubectl apply -f k8s
 

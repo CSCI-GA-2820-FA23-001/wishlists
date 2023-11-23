@@ -7,6 +7,7 @@ import logging
 from datetime import date
 from abc import abstractmethod
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import and_
 
 logger = logging.getLogger("flask.app")
 
@@ -232,3 +233,26 @@ class Wishlist(db.Model, PersistentBase):
         """Finds a Wishlist by its id"""
         logger.info("Processing lookup for Wishlist with id %s ...", by_id)
         return cls.query.get(by_id)
+
+    @classmethod
+    def filter_by_date(cls, start=None, end=None):
+        """Return all wishlists filtered by the date
+
+        Args:
+            start (date): start date
+            end (date): end date
+        """
+        logger.info("Processing date filter for date between %s and %s", start, end)
+        if start and end:
+            if start > end:
+                raise DataValidationError(
+                    "Invalid Date: start date should be smaller than end date"
+                )
+            return cls.query.filter(
+                and_(cls.date_joined <= end, cls.date_joined >= start)
+            )
+        if start:
+            return cls.query.filter(cls.date_joined >= start)
+        if end:
+            return cls.query.filter(cls.date_joined <= end)
+        return cls.all()

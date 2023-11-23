@@ -23,6 +23,22 @@ Before Run, make sure you have install [Docker Desktop](https://www.docker.com/p
 - The service is available at localhost: ```http://localhost:8000```
 
 To run the all the test cases locally, please run the command ```make test```. The test cases have 95% code coverage currently.
+
+## Deploy to Kubernetes locally
+
+Use the commands:
+
+- ```make cluster```
+- ```make deploy```
+
+In `make deploy`, we build, tag and push the image and deploy it to Kubernetes:
+
+- ```docker build -t wishlist:1.0 .```
+- ```docker tag wishlist:1.0 cluster-registry:32000/wishlist:1.0```
+- ```docker push cluster-registry:32000/wishlist:1.0```
+- ```kubectl apply -f k8s```
+
+
 ## Wishlist Model
 ```
 wishlist = {
@@ -57,14 +73,14 @@ get_wishlists      GET      /wishlists/<wishlist_id>
 update_wishlists   PUT      /wishlists/<wishlist_id>
 delete_wishlists   DELETE   /wishlists/<wishlist_id>
 
-list_products      GET      /wishlists/<int:wishlist_id>/products
+list_products      GET      /wishlists/<wishlist_id>/products
 create_products    POST     /wishlists/<wishlist_id>/products
 get_products       GET      /wishlists/<wishlist_id>/products/<product_id>
 update_products    PUT      /wishlists/<wishlist_id>/products/<product_id>
 delete_products    DELETE   /wishlists/<wishlist_id>/products/<product_id>
 ```
 <!-- 
-The test cases have 95% test coverage and can be run with `nosetests` -->
+The test cases have 95% test coverage and can be run with `make test` -->
 
 
 

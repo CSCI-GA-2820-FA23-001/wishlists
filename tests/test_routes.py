@@ -8,10 +8,12 @@ Test cases can be run with the following:
 # import os
 import logging
 from unittest import TestCase
+from datetime import date
 from service import app
 from service.models import db, Wishlist, Product
 from service.common import status  # HTTP Status Codes
 from tests.factories import WishlistFactory, ProductFactory
+
 
 BASE_URL = "/wishlists"
 
@@ -303,6 +305,31 @@ class TestWishlistServer(TestCase):
         data = resp.get_json()
         self.assertEqual(data[0]["owner"], wishlists[1].owner)
 
+    def test_list_wishlist_with_date_filter(self):
+        """It should return filtered wishlists"""
+        wishlists = self._create_wishlists(3)
+        wishlists[0].date_joined = date(2000, 1, 1)
+        wishlists[1].date_joined = date(2001, 1, 1)
+        wishlists[2].date_joined = date(2002, 1, 1)
+        wishlists[0].update()
+
+        resp = self.client.get(f"{BASE_URL}?start=2000-12-30&end=2001-12-30")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertEqual(data[0]["id"], wishlists[1].id)
+
+        resp = self.client.get(f"{BASE_URL}?start=2000-12-30")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertEqual(data[0]["id"], wishlists[1].id)
+        self.assertEqual(data[1]["id"], wishlists[2].id)
+
+        resp = self.client.get(f"{BASE_URL}?end=2001-12-30")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertEqual(data[0]["id"], wishlists[0].id)
+        self.assertEqual(data[1]["id"], wishlists[1].id)
+
     # def test_update_wishlist_by_name(self):
     #     """It should Update an existing Wishlist"""
     #     # create an Wishlist to update
@@ -336,6 +363,24 @@ class TestWishlistServer(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         updated_wishlist = resp.get_json()
         self.assertEqual(updated_wishlist["name"], "nyu-wishlist")
+
+    def test_copy_a_wishlist(self):
+        """It should copy an existing Wishlist"""
+        wishlists = self._create_wishlists(1)
+        old_wishlist = wishlists[0]
+        self._create_products(old_wishlist.id, 2)
+
+        resp = self.client.post(f"{BASE_URL}/{old_wishlist.id}/copy")
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        data = resp.get_json()
+        new_id = data["id"]
+        # now get the new list
+        resp = self.client.get(f"{BASE_URL}/{new_id}")
+        data = resp.get_json()
+
+        self.assertNotEqual(data["id"], old_wishlist.id)
+        self.assertEqual(data["name"], old_wishlist.name + " COPY")
+        self.assertEqual(len(data["products"]), 2)
 
     ######################################################################
     #  E R R O R    H A N D L E R   T E S T
