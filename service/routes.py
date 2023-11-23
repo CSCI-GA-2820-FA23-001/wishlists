@@ -145,7 +145,7 @@ def get_product(wishlist_id, product_id):
     This endpoint returns just an product
     """
     app.logger.info(
-        "Request to retrieve product %s in wishlist id: %s", (product_id, wishlist_id)
+        "Request to retrieve product %d in wishlist id: %d", (product_id, wishlist_id)
     )
 
     # See if the product exists and abort if it doesn't
