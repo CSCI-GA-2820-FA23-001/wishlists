@@ -63,8 +63,5 @@ login: ## Login to IBM Cloud using yur api key
 .PHONY: deploy
 depoy: ## Deploy the service on local Kubernetes
 	$(info Deploying service locally...)
-	docker build -t wishlist:1.0 .
-	docker tag wishlist:1.0 cluster-registry:32000/wishlist:1.0
-	docker push cluster-registry:32000/wishlist:1.0
 	kubectl apply -f k8s
 
