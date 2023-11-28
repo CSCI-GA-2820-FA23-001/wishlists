@@ -31,7 +31,7 @@ from compare import expect
 def step_impl(context):
     """Delete all Wishlists and load new ones"""
     # List all of the wishlists and delete them one by one
-    rest_endpoint = f"{context.BASE_URL}"
+    rest_endpoint = f"{context.BASE_URL}/wishlists"
     context.resp = requests.get(rest_endpoint)
     expect(context.resp.status_code).to_equal(200)
     for wishlist in context.resp.json():
@@ -53,7 +53,7 @@ def step_impl(context):
     for row in context.table:
         wishlist_name = row["wishlist_name"]
         queryString = "name=" + wishlist_name
-        rest_endpoint = f"{context.BASE_URL}?{queryString}"
+        rest_endpoint = f"{context.BASE_URL}/wishlists?{queryString}"
         context.resp = requests.get(rest_endpoint)
         print(context.resp.json())
         wishlist_id = context.resp.json()[0]["id"]
@@ -62,7 +62,7 @@ def step_impl(context):
             "product_id": int(row["product_id"]),
             "quantity": int(row["quantity"]),
         }
-        endpoint = f"{context.BASE_URL}/{wishlist_id}/products"
+        endpoint = f"{context.BASE_URL}/wishlists/{wishlist_id}/products"
         print(endpoint)
         context.resp = requests.post(endpoint, json=payload)
         print(context.resp.json())
