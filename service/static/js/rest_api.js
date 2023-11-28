@@ -75,8 +75,15 @@ $(function () {
                 tableContent += `<tr>
                                     <td>${wishlist.id}</td>
                                     <td>${wishlist.name}</td>
-                                    <td>${wishlist.description}</td>
-                                </tr>`;
+                                    <td>`;
+                wishlist.products.forEach(function(product, index, array){
+                    if (index < array.length - 1) {
+                        tableContent += `${product.name}, `
+                    } else {
+                        tableContent += `${product.name}`
+                    }
+                })
+                tableContent += `</td></tr>`;
             });
             $("#wishlist_table_body").append(tableContent);
             flash_message("Wishlists retrieved successfully");
