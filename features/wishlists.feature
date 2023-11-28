@@ -6,13 +6,13 @@ Feature: The wishlists service back-end
 Background:
     Given the following wishlists
         | name      | user_name |
-        | wish_1    | 3    | 
-        | wish_2    | 3    | 
-        | wish_3    | 4    |
-        | wish_4    | 5    |
+        | wish_1    | user_3    | 
+        | wish_2    | user_3    | 
+        | wish_3    | user_4    |
+        | wish_4    | user_5    |
 
     Given the following wishlist items
-        | name      | wishlist_name | product_id | quantity|
+        | name      | wishlist_id | product_id | quantity|
         | item_1    | wish_1    | 3 | 5 | 
         | item_2    | wish_1    | 4 | 2 | 
         | item_3    | wish_2    | 5 | 3 | 
