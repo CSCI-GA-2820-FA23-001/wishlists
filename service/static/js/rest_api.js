@@ -72,7 +72,6 @@ $(function () {
             $("#wishlist_table_body").empty();
             let tableContent = "";
             res.forEach(function(wishlist) {
-                console.log(wishlist.products)
                 tableContent += `<tr>
                                     <td>${wishlist.id}</td>
                                     <td>${wishlist.name}</td>
