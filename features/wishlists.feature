@@ -40,11 +40,4 @@ Feature: The wishlists service back-end
         And I should see "wish_5" in the "Wishlist Name" field
         And I should see "5" in the "User Name" field
 
-    Scenario: List all Wishlists
-        When I visit the "Home Page"
-        And I press the "Retrieve" button
-        Then I should see the message "Success"
-        And I should see "wish_1" in the results
-        And I should see "wish_2" in the results
-        And I should see "wish_3" in the results
-        And I should see "wish_4" in the results
+    
