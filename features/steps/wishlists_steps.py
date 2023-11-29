@@ -64,6 +64,7 @@ def step_impl(context):
         context.resp = requests.get(rest_endpoint)
         print(context.resp.json())
         wishlist_id = context.resp.json()[0]["id"]
+        print(wishlist_id)
         payload = {
             "name": row["name"],
             "product_id": int(row["product_id"]),
