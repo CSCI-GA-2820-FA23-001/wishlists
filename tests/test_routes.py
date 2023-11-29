@@ -298,12 +298,20 @@ class TestWishlistServer(TestCase):
         self.assertEqual(len(data), 5)
 
     def test_list_wishlist_by_owner(self):
-        """It should Get an wishlist by Name"""
+        """It should Get an wishlist by Owner"""
         wishlists = self._create_wishlists(3)
         resp = self.client.get(BASE_URL, query_string=f"owner={wishlists[1].owner}")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = resp.get_json()
         self.assertEqual(data[0]["owner"], wishlists[1].owner)
+
+    def test_list_wishlist_by_name(self):
+        """It should Get an wishlist by Name"""
+        wishlists = self._create_wishlists(3)
+        resp = self.client.get(BASE_URL, query_string=f"name={wishlists[1].name}")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertEqual(data[0]["name"], wishlists[1].name)
 
     def test_list_wishlist_with_date_filter(self):
         """It should return filtered wishlists"""

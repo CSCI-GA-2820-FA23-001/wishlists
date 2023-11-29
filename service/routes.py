@@ -55,11 +55,14 @@ def list_wishlists():
     owner = request.args.get("owner")
     start = request.args.get("start")
     end = request.args.get("end")
+    name = request.args.get("name")
 
     # Process the query string if any
 
     if owner:
         accounts = Wishlist.find_by_owner(owner)
+    elif name:
+        accounts = Wishlist.find_by_name(name)
     elif start or end:
         # filter by start and end date
         start_date = None
@@ -209,7 +212,7 @@ def create_products(wishlist_id):
     new_product.create()
 
     # Update wishlist_id if not consistent
-    if new_product.wishlist_id != wishlist_id:
+    if new_product.wishlist_id and new_product.wishlist_id != wishlist_id:
         new_product.wishlist_id = wishlist_id
         new_product.update()
 

@@ -25,13 +25,14 @@ For information on Waiting until elements are present in the HTML see:
 import requests
 from behave import given
 from compare import expect
+from datetime import datetime
 
 
 @given("the following wishlists")
 def step_impl(context):
     """Delete all Wishlists and load new ones"""
     # List all of the wishlists and delete them one by one
-    rest_endpoint = f"{context.BASE_URL}/api/wishlists"
+    rest_endpoint = f"{context.BASE_URL}/wishlists"
     context.resp = requests.get(rest_endpoint)
     expect(context.resp.status_code).to_equal(200)
     for wishlist in context.resp.json():
@@ -39,8 +40,14 @@ def step_impl(context):
         expect(context.resp.status_code).to_equal(204)
 
     # load the database with new wishlists
+    # current_date = datetime.now().date()
     for row in context.table:
-        payload = {"name": row["name"], "customer_id": int(row["customer_id"])}
+        payload = {
+            "name": row["name"], 
+            "owner": row["user_name"],
+            "date_joined": "2023-11-28",
+            "products": [],
+        }
         context.resp = requests.post(rest_endpoint, json=payload)
         expect(context.resp.status_code).to_equal(201)
 
@@ -53,17 +60,17 @@ def step_impl(context):
     for row in context.table:
         wishlist_name = row["wishlist_name"]
         queryString = "name=" + wishlist_name
-        rest_endpoint = f"{context.BASE_URL}/api/wishlists?{queryString}"
+        rest_endpoint = f"{context.BASE_URL}/wishlists?{queryString}"
         context.resp = requests.get(rest_endpoint)
         print(context.resp.json())
         wishlist_id = context.resp.json()[0]["id"]
+        # print(wishlist_id)
         payload = {
             "name": row["name"],
-            "product_id": int(row["product_id"]),
+            "wishlist_id": wishlist_id,
             "quantity": int(row["quantity"]),
-            "price": int(row["price"]),
         }
-        endpoint = f"{context.BASE_URL}/api/wishlists/{wishlist_id}/items"
+        endpoint = f"{context.BASE_URL}/wishlists/{wishlist_id}/products"
         print(endpoint)
         context.resp = requests.post(endpoint, json=payload)
         print(context.resp.json())
