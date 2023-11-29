@@ -25,6 +25,7 @@ For information on Waiting until elements are present in the HTML see:
 import requests
 from behave import given
 from compare import expect
+from datetime import datetime
 
 
 @given("the following wishlists")
@@ -40,7 +41,12 @@ def step_impl(context):
 
     # load the database with new wishlists
     for row in context.table:
-        payload = {"name": row["name"], "owner": row["user_name"],}
+        payload = {
+            "name": row["name"], 
+            "owner": row["user_name"],
+            "date_joined": datetime.now().date(),
+            "products": []
+        }
         context.resp = requests.post(rest_endpoint, json=payload)
         expect(context.resp.status_code).to_equal(201)
 
@@ -60,7 +66,7 @@ def step_impl(context):
         payload = {
             "name": row["name"],
             "product_id": int(row["product_id"]),
-            "quantity": int(row["quantity"]),
+            "quantity": int(row["quantity"])
         }
         endpoint = f"{context.BASE_URL}/wishlists/{wishlist_id}/products"
         print(endpoint)
