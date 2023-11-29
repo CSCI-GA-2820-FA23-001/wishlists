@@ -40,7 +40,7 @@ def step_impl(context):
         expect(context.resp.status_code).to_equal(204)
 
     # load the database with new wishlists
-    current_date = datetime.now().date()
+    # current_date = datetime.now().date()
     for row in context.table:
         payload = {
             "name": row["name"], 
