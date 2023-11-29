@@ -61,7 +61,7 @@ def list_wishlists():
 
     if owner:
         accounts = Wishlist.find_by_owner(owner)
-    if name:
+    elif name:
         accounts = Wishlist.find_by_name(name)
     elif start or end:
         # filter by start and end date
