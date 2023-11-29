@@ -45,7 +45,7 @@ def step_impl(context):
         payload = {
             "name": row["name"], 
             "owner": row["user_name"],
-            "date_joined": current_date,
+            "date_joined": "2023-11-28",
             "products": [],
         }
         context.resp = requests.post(rest_endpoint, json=payload)
