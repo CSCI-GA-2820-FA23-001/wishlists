@@ -12,7 +12,7 @@ Background:
         | wish_4    | user_5    |
 
     Given the following wishlist items
-        | name      | wishlist_id | product_id | quantity|
+        | name      | wishlist_name | product_id | quantity|
         | item_1    | wish_1    | 3 | 5 | 
         | item_2    | wish_1    | 4 | 2 | 
         | item_3    | wish_2    | 5 | 3 | 
