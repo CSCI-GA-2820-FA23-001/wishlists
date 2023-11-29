@@ -305,7 +305,7 @@ class TestWishlistServer(TestCase):
         data = resp.get_json()
         self.assertEqual(data[0]["owner"], wishlists[1].owner)
 
-    def test_list_wishlist_by_owner(self):
+    def test_list_wishlist_by_name(self):
         """It should Get an wishlist by Name"""
         wishlists = self._create_wishlists(3)
         resp = self.client.get(BASE_URL, query_string=f"name={wishlists[1].name}")
