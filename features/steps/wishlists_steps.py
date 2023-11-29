@@ -62,7 +62,7 @@ def step_impl(context):
         queryString = "name=" + wishlist_name
         rest_endpoint = f"{context.BASE_URL}/wishlists?{queryString}"
         context.resp = requests.get(rest_endpoint)
-        # print(context.resp.json())
+        print(context.resp.json())
         wishlist_id = context.resp.json()[0]["id"]
         # print(wishlist_id)
         payload = {
@@ -71,7 +71,7 @@ def step_impl(context):
             "quantity": int(row["quantity"]),
         }
         endpoint = f"{context.BASE_URL}/wishlists/{wishlist_id}/products"
-        # print(endpoint)
+        print(endpoint)
         context.resp = requests.post(endpoint, json=payload)
         print(context.resp.json())
         expect(context.resp.status_code).to_equal(201)
