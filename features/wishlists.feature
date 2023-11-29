@@ -12,11 +12,11 @@ Background:
         | wish_4    | user_5    |
 
     Given the following wishlist items
-        | name      | wishlist_name | product_id | quantity|
-        | item_1    | wish_1    | 3 | 5 | 
-        | item_2    | wish_1    | 4 | 2 | 
-        | item_3    | wish_2    | 5 | 3 | 
-        | item_4    | wish_4    | 6 | 1 | 
+        | name      | wishlist_name| quantity|
+        | item_1    | wish_1    | 5 | 
+        | item_2    | wish_1    | 2 | 
+        | item_3    | wish_2    | 3 | 
+        | item_4    | wish_4    | 1 | 
 
 Scenario: The server is running
     When I visit the "Home Page"

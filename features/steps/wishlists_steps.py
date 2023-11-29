@@ -67,7 +67,7 @@ def step_impl(context):
         print(wishlist_id)
         payload = {
             "name": row["name"],
-            "product_id": int(row["product_id"]),
+            "wishlist_id": wishlist_id,
             "quantity": int(row["quantity"]),
         }
         endpoint = f"{context.BASE_URL}/wishlists/{wishlist_id}/products"

@@ -212,7 +212,7 @@ def create_products(wishlist_id):
     new_product.create()
 
     # Update wishlist_id if not consistent
-    if new_product.wishlist_id != wishlist_id:
+    if new_product.wishlist_id and new_product.wishlist_id != wishlist_id:
         new_product.wishlist_id = wishlist_id
         new_product.update()
 
