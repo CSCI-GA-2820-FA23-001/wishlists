@@ -111,8 +111,6 @@ $(function () {
             "products": [],
             "owner": owner
         };
-
-        $("#flash_message").empty();
         
         let ajax = $.ajax({
             type: "POST",
@@ -196,6 +194,30 @@ $(function () {
         });
 
     });
+
+    // ****************************************
+    // Copy a Wishlist
+    // ****************************************
+
+    $("#copy-btn").click(function () {
+        let wishlist_id = $("#wishlist_id").val();
+
+        $("#flash_message").empty();
+        
+        let ajax = $.ajax({
+            type: "POST",
+            url: `/wishlists/${wishlist_id}/copy`,
+            contentType: "application/json",
+            data: ''
+        })
+
+        ajax.done(function(res){
+            update_form_data(res)
+            flash_message("Success")
+        });
+
+    });
+
 
     // ****************************************
     // Delete a Wishlist
