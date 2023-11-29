@@ -55,11 +55,14 @@ def list_wishlists():
     owner = request.args.get("owner")
     start = request.args.get("start")
     end = request.args.get("end")
+    name = request.args.get("name")
 
     # Process the query string if any
 
     if owner:
         accounts = Wishlist.find_by_owner(owner)
+    if name:
+        accounts = Wishlist.find_by_name(name)
     elif start or end:
         # filter by start and end date
         start_date = None
