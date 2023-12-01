@@ -39,3 +39,15 @@ Scenario: Create a Wishlist
     Then I should see the message "Success"
     And I should see "wish_5" in the "Wishlist Name" field
     And I should see "5" in the "User Name" field
+
+Scenario: Read a wishlist
+    When I visit the "Home Page"
+    And I press the "List" button
+    Then I should see the message "Success"
+    When I copy the "ID" field 
+    And I paste the "Wishlist ID" field 
+    And I press the "Retrieve" button
+    Then I should see the message "Success"
+    And I should see "wish_1" in the "Name" field
+    And I should see "user_3" in the "Owner" field
+    And I should see "2023-11-30" in the "Date" field
