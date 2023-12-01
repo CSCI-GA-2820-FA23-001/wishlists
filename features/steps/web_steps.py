@@ -140,7 +140,7 @@ def step_impl(context, name):
     expect(found).to_be(True)
 
 
-@then('I should not see "{name}" in the results')
+@then('I should not see "{name}" in the wishlist results')
 def step_impl(context, name):
     element = context.driver.find_element_by_id("wishlist_results")
     error_msg = "I should not see '%s' in '%s'" % (name, element.text)

@@ -51,4 +51,4 @@ Scenario: Read a wishlist
     Then I should see the message "Success"
     And I should see "wish_1" in the "Wishlist Name" field
     And I should see "user_3" in the "User Name" field
-    And I should see "2023-11-30" in the results
+    And I should see "2023-11-30" in the wishlist results

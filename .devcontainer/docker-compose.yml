@@ -19,7 +19,7 @@ services:
       PORT: 8000
       DATABASE_URI: postgresql://postgres:postgres@postgres:5432/postgres
       DRIVER: firefox
-      WAIT_SECONDS: 5
+      WAIT_SECONDS: 3
     networks:
       - dev
     depends_on:
