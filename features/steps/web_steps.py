@@ -123,7 +123,7 @@ def step_impl(context, button):
 @then('I should see "{name}" in the wishlist results')
 def step_impl(context, name):
     print(name)
-    print(context.driver.find_element_ny_id("wishlist_results"))
+    #print(context.driver.find_element_by_id("wishlist_results"))
     found = WebDriverWait(context.driver, context.WAIT_SECONDS).until(
         expected_conditions.text_to_be_present_in_element(
             (By.ID, "wishlist_results"), name
