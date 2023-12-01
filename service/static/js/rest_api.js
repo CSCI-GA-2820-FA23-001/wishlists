@@ -75,12 +75,14 @@ $(function () {
                 tableContent += `<tr>
                                     <td>${wishlist.id}</td>
                                     <td>${wishlist.name}</td>
+                                    <td>${wishlist.owner}</td>
+                                    <td>${wishlist.date_joined}</td>
                                     <td>`;
                 wishlist.products.forEach(function(product, index, array){
                     if (index < array.length - 1) {
-                        tableContent += `${product.name}, `
+                        tableContent += `${product.name} (${product.quantity}), `
                     } else {
-                        tableContent += `${product.name}`
+                        tableContent += `${product.name} (${product.quantity})`
                     }
                 })
                 tableContent += `</td></tr>`;
@@ -125,8 +127,39 @@ $(function () {
         });
 
         // ajax.fail(function(res){
-        //     flash_message(res.responseJSON.message)
+        //      flash_message(res.responseJSON.message)
         // });
+    });
+
+    // ****************************************
+    // Search a Wishlist by name
+    // ****************************************
+
+    $("#search-btn").click(function () {
+        let name = $("#wishlist_name").val();
+
+        $("#flash_message").empty();
+
+        let query = 'name=' + name;
+        
+        let ajax = $.ajax({
+            type: "GET",
+            url: `/wishlists?${query}`,
+            contentType: "application/json",
+            data: "",
+        });
+
+        ajax.done(function(res){
+            if (res.length > 0)
+            {
+                update_form_data(res[0]);
+            }    
+            flash_message("Success")
+        });
+
+        ajax.fail(function(res){
+            flash_message(res.responseJSON.message)
+        });
     });
 
     // ****************************************
