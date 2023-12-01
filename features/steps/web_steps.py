@@ -120,21 +120,21 @@ def step_impl(context, button):
     context.driver.find_element_by_id(button_id).click()
 
 
-@then('I should see "{name}" in the results')
+@then('I should see "{name}" in the wishlist results')
 def step_impl(context, name):
     found = WebDriverWait(context.driver, context.WAIT_SECONDS).until(
         expected_conditions.text_to_be_present_in_element(
-            (By.ID, "search_results"), name
+            (By.ID, "wishlist_results"), name
         )
     )
     expect(found).to_be(True)
 
 
-@then('I should see "{name}" in the item results')
+@then('I should see "{name}" in the product results')
 def step_impl(context, name):
     found = WebDriverWait(context.driver, context.WAIT_SECONDS).until(
         expected_conditions.text_to_be_present_in_element(
-            (By.ID, "search_item_results"), name
+            (By.ID, "product_results"), name
         )
     )
     expect(found).to_be(True)
@@ -142,14 +142,14 @@ def step_impl(context, name):
 
 @then('I should not see "{name}" in the results')
 def step_impl(context, name):
-    element = context.driver.find_element_by_id("search_results")
+    element = context.driver.find_element_by_id("wishlist_results")
     error_msg = "I should not see '%s' in '%s'" % (name, element.text)
     ensure(name in element.text, False, error_msg)
 
 
-@then('I should not see "{name}" in the item results')
+@then('I should not see "{name}" in the product results')
 def step_impl(context, name):
-    element = context.driver.find_element_by_id("search_item_results")
+    element = context.driver.find_element_by_id("product_results")
     error_msg = "I should not see '%s' in '%s'" % (name, element.text)
     ensure(name in element.text, False, error_msg)
 
