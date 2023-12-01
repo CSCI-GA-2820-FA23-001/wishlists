@@ -33,7 +33,7 @@ $(function () {
         $("#flash_message").append(message);
     }
 
-    
+
     // ****************************************
     // List All Wishlists
     // ****************************************
@@ -44,7 +44,7 @@ $(function () {
         let end_date = $("#end_filter").val();
 
         $("#flash_message").empty();
-        
+
         let queryString = "";
         if (owner) {
             queryString += 'owner=' + owner;
@@ -67,18 +67,18 @@ $(function () {
             contentType: "application/json",
             data: "",
         });
-        
-        ajax.done(function(res){
+
+        ajax.done(function (res) {
             $("#wishlist_table_body").empty();
             let tableContent = "";
-            res.forEach(function(wishlist) {
+            res.forEach(function (wishlist) {
                 tableContent += `<tr>
                                     <td>${wishlist.id}</td>
                                     <td>${wishlist.name}</td>
                                     <td>${wishlist.owner}</td>
                                     <td>${wishlist.date_joined}</td>
                                     <td>`;
-                wishlist.products.forEach(function(product, index, array){
+                wishlist.products.forEach(function (product, index, array) {
                     if (index < array.length - 1) {
                         tableContent += `${product.name} (${product.quantity}), `
                     } else {
@@ -88,10 +88,11 @@ $(function () {
                 tableContent += `</td></tr>`;
             });
             $("#wishlist_table_body").append(tableContent);
-            flash_message("Wishlists retrieved successfully");
+            // flash_message("Wishlists retrieved successfully");
+            flash_message("Success")
         });
 
-        ajax.fail(function(res){
+        ajax.fail(function (res) {
             flash_message("Failed to retrieve wishlists: " + res.responseJSON.message);
         });
     });
@@ -113,7 +114,7 @@ $(function () {
             "products": [],
             "owner": owner
         };
-        
+
         let ajax = $.ajax({
             type: "POST",
             url: "/wishlists",
@@ -121,7 +122,7 @@ $(function () {
             data: JSON.stringify(data),
         });
 
-        ajax.done(function(res){
+        ajax.done(function (res) {
             update_form_data(res)
             flash_message("Success")
         });
@@ -141,7 +142,7 @@ $(function () {
         $("#flash_message").empty();
 
         let query = 'name=' + name;
-        
+
         let ajax = $.ajax({
             type: "GET",
             url: `/wishlists?${query}`,
@@ -149,15 +150,14 @@ $(function () {
             data: "",
         });
 
-        ajax.done(function(res){
-            if (res.length > 0)
-            {
+        ajax.done(function (res) {
+            if (res.length > 0) {
                 update_form_data(res[0]);
-            }    
+            }
             flash_message("Success")
         });
 
-        ajax.fail(function(res){
+        ajax.fail(function (res) {
             flash_message(res.responseJSON.message)
         });
     });
@@ -182,18 +182,18 @@ $(function () {
         $("#flash_message").empty();
 
         let ajax = $.ajax({
-                type: "PUT",
-                url: `/wishlists/${wishlist_id}`,
-                contentType: "application/json",
-                data: JSON.stringify(data)
-            })
+            type: "PUT",
+            url: `/wishlists/${wishlist_id}`,
+            contentType: "application/json",
+            data: JSON.stringify(data)
+        })
 
-        ajax.done(function(res){
+        ajax.done(function (res) {
             update_form_data(res)
             flash_message("Success")
         });
 
-        ajax.fail(function(res){
+        ajax.fail(function (res) {
             flash_message(res.responseJSON.message)
         });
 
@@ -215,13 +215,13 @@ $(function () {
             data: ''
         })
 
-        ajax.done(function(res){
+        ajax.done(function (res) {
             //alert(res.toSource())
             update_form_data(res)
             flash_message("Success")
         });
 
-        ajax.fail(function(res){
+        ajax.fail(function (res) {
             clear_form_data()
             flash_message(res.responseJSON.message)
         });
@@ -236,7 +236,7 @@ $(function () {
         let wishlist_id = $("#wishlist_id").val();
 
         $("#flash_message").empty();
-        
+
         let ajax = $.ajax({
             type: "POST",
             url: `/wishlists/${wishlist_id}/copy`,
@@ -244,7 +244,7 @@ $(function () {
             data: ''
         })
 
-        ajax.done(function(res){
+        ajax.done(function (res) {
             update_form_data(res)
             flash_message("Success")
         });
@@ -268,12 +268,12 @@ $(function () {
             data: '',
         })
 
-        ajax.done(function(res){
+        ajax.done(function (res) {
             clear_form_data()
             flash_message("Wishlist has been Deleted!")
         });
 
-        ajax.fail(function(res){
+        ajax.fail(function (res) {
             flash_message("Server error!")
         });
     });
@@ -315,18 +315,18 @@ $(function () {
         let wishlist_id = $("#product_wishlist_id").val();
 
         $("#flash_message").empty();
-        
+
         let ajax = $.ajax({
             type: "GET",
             url: `/wishlists/${wishlist_id}/products`,
             contentType: "application/json",
             data: "",
         });
-        
-        ajax.done(function(res){
+
+        ajax.done(function (res) {
             $("#product_table_body").empty();
             let tableContent = "";
-            res.forEach(function(products) {
+            res.forEach(function (products) {
                 tableContent += `<tr>
                                     <td>${products.id}</td>
                                     <td>${products.wishlist_id}</td>
@@ -338,7 +338,7 @@ $(function () {
             flash_message("Products retrieved successfully");
         });
 
-        ajax.fail(function(res){
+        ajax.fail(function (res) {
             flash_message("Failed to retrieve products: " + res.responseJSON.message);
         });
     });
@@ -363,7 +363,7 @@ $(function () {
         };
 
         $("#flash_message").empty();
-        
+
         let ajax = $.ajax({
             type: "POST",
             url: `/wishlists/${wishlist_id}/products`,
@@ -371,7 +371,7 @@ $(function () {
             data: JSON.stringify(data),
         });
 
-        ajax.done(function(res){
+        ajax.done(function (res) {
             update_product_form_data(res)
             flash_message("Product create Success")
         });
@@ -401,18 +401,18 @@ $(function () {
         $("#flash_message").empty();
 
         let ajax = $.ajax({
-                type: "PUT",
-                url: `/wishlists/${wishlist_id}/products/${product_id}`,
-                contentType: "application/json",
-                data: JSON.stringify(data)
-            })
+            type: "PUT",
+            url: `/wishlists/${wishlist_id}/products/${product_id}`,
+            contentType: "application/json",
+            data: JSON.stringify(data)
+        })
 
-        ajax.done(function(res){
+        ajax.done(function (res) {
             update_product_form_data(res)
             flash_message("Product update Success")
         });
 
-        ajax.fail(function(res){
+        ajax.fail(function (res) {
             flash_message(res.responseJSON.message)
         });
 
@@ -435,13 +435,13 @@ $(function () {
             data: ''
         })
 
-        ajax.done(function(res){
+        ajax.done(function (res) {
             //alert(res.toSource())
             update_product_form_data(res)
             flash_message("Retrieve product Success")
         });
 
-        ajax.fail(function(res){
+        ajax.fail(function (res) {
             clear_form_data()
             flash_message(res.responseJSON.message)
         });
@@ -465,12 +465,12 @@ $(function () {
             data: '',
         })
 
-        ajax.done(function(res){
+        ajax.done(function (res) {
             clear_product_form_data()
             flash_message("Products has been Deleted!")
         });
 
-        ajax.fail(function(res){
+        ajax.fail(function (res) {
             flash_message("Server error!")
         });
     });
