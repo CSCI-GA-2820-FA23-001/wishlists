@@ -75,12 +75,14 @@ $(function () {
                 tableContent += `<tr>
                                     <td>${wishlist.id}</td>
                                     <td>${wishlist.name}</td>
+                                    <td>${wishlist.owner}</td>
+                                    <td>${wishlist.date_joined}</td>
                                     <td>`;
                 wishlist.products.forEach(function(product, index, array){
                     if (index < array.length - 1) {
-                        tableContent += `${product.name}, `
+                        tableContent += `${product.name} (${product.quantity}), `
                     } else {
-                        tableContent += `${product.name}`
+                        tableContent += `${product.name} (${product.quantity})`
                     }
                 })
                 tableContent += `</td></tr>`;
