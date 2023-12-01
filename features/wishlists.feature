@@ -42,9 +42,10 @@ Scenario: Create a Wishlist
 
 Scenario: Read a wishlist
     When I visit the "Home Page"
-    And I press the "List" button
+    And I set the "Wishlist Name" to "wish_1"
+    And I press the "Search" button
     Then I should see the message "Success"
-    When I copy the "ID" field 
+    When I copy the "Wishlist ID" field 
     And I paste the "Wishlist ID" field 
     And I press the "Retrieve" button
     Then I should see the message "Success"
