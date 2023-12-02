@@ -177,6 +177,19 @@ class TestWishlist(unittest.TestCase):
         self.assertEqual(new_wishlist.owner, wishlist.owner)
         self.assertEqual(new_wishlist.date_joined, wishlist.date_joined)
 
+    def test_find_product_by_name(self):
+        """It should Find products in a wishlist by name"""
+        wishlist = WishlistFactory()
+        product = ProductFactory(wishlist=wishlist)
+        wishlist.create()
+        # print(wishlist.__repr__)
+        # print(product.__repr__)
+
+        # Fetch it back by name
+        same_product = wishlist.find_product_by_name(product.name)[0]
+        self.assertEqual(same_product.id, product.id)
+        self.assertEqual(same_product.name, product.name)
+
     def test_deserialize_with_key_error(self):
         """It should not Deserialize an wishlist with a KeyError"""
         wishlist = Wishlist()
@@ -302,7 +315,7 @@ class TestProduct(unittest.TestCase):
         # Fetch it back
         wishlist = Wishlist.find(wishlist.id)
         old_product = wishlist.products[0]
-        print("%r", old_product)
+        # print("%r", old_product)
         self.assertEqual(old_product.name, product.name)
         # Change the city
         old_product.name = "XX"

@@ -179,8 +179,13 @@ def list_products(wishlist_id):
             f"Wishlist with id '{wishlist_id}' could not be found.",
         )
 
-    # Get the addresses for the account
-    results = [product.serialize() for product in wishlist.products]
+    # Get query args
+    name = request.args.get("name")
+    if name:
+        products = wishlist.find_product_by_name(name)
+        results = [product.serialize() for product in products]
+    else:
+        results = [product.serialize() for product in wishlist.products]
 
     return make_response(jsonify(results), status.HTTP_200_OK)
 
@@ -244,7 +249,6 @@ def get_product(wishlist_id, product_id):
     """
     app.logger.info(
         "Request to update Product %d in Wishlist id: %d", product_id, wishlist_id
-
     )
 
     # See if the product exists and abort if it doesn't

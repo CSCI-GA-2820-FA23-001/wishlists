@@ -163,6 +163,13 @@ class TestWishlistServer(TestCase):
         data = resp.get_json()
         self.assertEqual(len(data), 2)
 
+        # test get products by name
+        resp = self.client.get(
+            f"{BASE_URL}/{wishlist.id}/products?name={wishlist.products[0].name}"
+        )
+        data = resp.get_json()[0]
+        self.assertEqual(data["name"], wishlist.products[0].name)
+
     def test_get_product(self):
         """It should Get an product from an wishlist"""
         # create a known address

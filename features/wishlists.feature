@@ -52,9 +52,10 @@ Feature: The wishlists service back-end
         Then I should see the message "Success"
         And I should see "wish_1" in the "Wishlist Name" field
         And I should see "user_3" in the "User Name" field
+
     Scenario: Get all wishlists
         When I visit the "Home Page"
-        And I press the "list" button
+        And I press the "List" button
         Then I should see the message "Success"
         And I should see "wish_1" in the wishlist results
         And I should see "wish_2" in the wishlist results
