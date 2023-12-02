@@ -62,7 +62,6 @@ Feature: The wishlists service back-end
         And I should see "wish_3" in the wishlist results
         And I should see "wish_4" in the wishlist results
 
-
     Scenario:  List all Wishlists Items in a Wishlist
         When I visit the "Home Page"
         And I set the "Wishlist Name" to "wish_1"
