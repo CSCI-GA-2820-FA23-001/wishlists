@@ -16,9 +16,9 @@ DATABASE_URI = os.getenv(
 
 
 ######################################################################
-#  Wishlist   M O D E L   T E S T   C A S E S
+#  Wishlist Class Methods  M O D E L   T E S T   C A S E S
 ######################################################################
-class TestWishlist(unittest.TestCase):
+class TestWishlistClassMethods(unittest.TestCase):
     """Test Cases for Wishlist Model"""
 
     @classmethod
@@ -149,6 +149,54 @@ class TestWishlist(unittest.TestCase):
         self.assertEqual(same_wishlist.id, wishlist.id)
         self.assertEqual(same_wishlist.owner, wishlist.owner)
 
+    def test_filter_by_date(self):
+        """It should return wishlists filter by the date"""
+        wishlist = WishlistFactory()
+        wishlist.create()
+        wishlist.date_joined = date(2000, 1, 1)
+        date1 = date(1999, 1, 1)
+        date2 = date(2001, 1, 1)
+        date3 = date(2002, 1, 1)
+        self.assertEqual(wishlist.id, Wishlist.filter_by_date(date1, date2)[0].id)
+        self.assertEqual(wishlist.id, Wishlist.filter_by_date(start=date1)[0].id)
+        self.assertEqual(wishlist.id, Wishlist.filter_by_date(end=date2)[0].id)
+        self.assertEqual(wishlist.id, Wishlist.filter_by_date()[0].id)
+        self.assertEqual([], Wishlist.filter_by_date(date2, date3).all())
+        self.assertRaises(DataValidationError, Wishlist.filter_by_date, date2, date1)
+
+
+######################################################################
+#  Wishlist Other Methods  M O D E L   T E S T   C A S E S
+######################################################################
+class TestWishlist(unittest.TestCase):
+    """Test Cases for Wishlist Model"""
+
+    @classmethod
+    def setUpClass(cls):
+        """This runs once before the entire test suite"""
+        app.config["TESTING"] = True
+        app.config["DEBUG"] = False
+        app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URI
+        app.logger.setLevel(logging.CRITICAL)
+        Wishlist.init_db(app)
+
+    @classmethod
+    def tearDownClass(cls):
+        """This runs once after the entire test suite"""
+
+    def setUp(self):
+        """This runs before each test"""
+        db.session.query(Wishlist).delete()  # clean up the last tests
+        db.session.query(Product).delete()  # clean up the last tests
+        db.session.commit()
+
+    def tearDown(self):
+        """This runs after each test"""
+        db.session.remove()
+
+    ######################################################################
+    #  T E S T   C A S E S
+    ######################################################################
     def test_serialize_an_wishlist(self):
         """It should Serialize an wishlist"""
         wishlist = WishlistFactory()
@@ -176,19 +224,6 @@ class TestWishlist(unittest.TestCase):
         self.assertEqual(new_wishlist.name, wishlist.name)
         self.assertEqual(new_wishlist.owner, wishlist.owner)
         self.assertEqual(new_wishlist.date_joined, wishlist.date_joined)
-
-    def test_find_product_by_name(self):
-        """It should Find products in a wishlist by name"""
-        wishlist = WishlistFactory()
-        product = ProductFactory(wishlist=wishlist)
-        wishlist.create()
-        # print(wishlist.__repr__)
-        # print(product.__repr__)
-
-        # Fetch it back by name
-        same_product = wishlist.find_product_by_name(product.name)[0]
-        self.assertEqual(same_product.id, product.id)
-        self.assertEqual(same_product.name, product.name)
 
     def test_deserialize_with_key_error(self):
         """It should not Deserialize an wishlist with a KeyError"""
@@ -219,22 +254,23 @@ class TestWishlist(unittest.TestCase):
         wishlist = Wishlist()
         self.assertRaises(DataValidationError, wishlist.deserialize, data)
 
-    def test_filter_by_date(self):
-        """It should return wishlists filter by the date"""
+    def test_find_product_by_name(self):
+        """It should Find products in a wishlist by name"""
         wishlist = WishlistFactory()
+        product = ProductFactory(wishlist=wishlist)
         wishlist.create()
-        wishlist.date_joined = date(2000, 1, 1)
-        date1 = date(1999, 1, 1)
-        date2 = date(2001, 1, 1)
-        date3 = date(2002, 1, 1)
-        self.assertEqual(wishlist.id, Wishlist.filter_by_date(date1, date2)[0].id)
-        self.assertEqual(wishlist.id, Wishlist.filter_by_date(start=date1)[0].id)
-        self.assertEqual(wishlist.id, Wishlist.filter_by_date(end=date2)[0].id)
-        self.assertEqual(wishlist.id, Wishlist.filter_by_date()[0].id)
-        self.assertEqual([], Wishlist.filter_by_date(date2, date3).all())
-        self.assertRaises(DataValidationError, Wishlist.filter_by_date, date2, date1)
+        # print(wishlist.__repr__)
+        # print(product.__repr__)
+
+        # Fetch it back by name
+        same_product = wishlist.find_product_by_name(product.name)[0]
+        self.assertEqual(same_product.id, product.id)
+        self.assertEqual(same_product.name, product.name)
 
 
+######################################################################
+#  Product Methods  M O D E L   T E S T   C A S E S
+######################################################################
 class TestProduct(unittest.TestCase):
     """Test Cases for Wishlist Model"""
 
