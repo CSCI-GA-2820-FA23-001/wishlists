@@ -53,6 +53,20 @@ Feature: The wishlists service back-end
         And I should see "wish_1" in the "Wishlist Name" field
         And I should see "user_3" in the "User Name" field
 
+    Scenario: Delete a wishlist
+        When I visit the "home page"
+        And I press the "List" button
+        And I copy the "first cell of wishlist table" field
+        And I paste the "Wishlist ID" field
+        And I press the "Delete" button
+        Then I should see the message "Wishlist has been Deleted!"
+        When I press the "List" button
+        Then I should see the message "Success"
+        And I should not see "wish_1" in the wishlist results
+        And I should see "wish_2" in the wishlist results
+        And I should see "wish_3" in the wishlist results
+        And I should see "wish_4" in the wishlist results
+
     Scenario: Get all wishlists
         When I visit the "Home Page"
         And I press the "List" button
