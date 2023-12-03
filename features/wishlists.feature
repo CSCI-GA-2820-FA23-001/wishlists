@@ -166,3 +166,17 @@ Feature: The wishlists service back-end
         And I should see "new_wish_name" in the "Wishlist Name" field
         And I should see "new_user" in the "User Name" field
 
+    
+    Scenario: Create a Product
+        When I visit the "Home Page"
+        And I press the "List" button
+        And I copy the "first cell of wishlist table" field
+        And I paste the "Product Wishlist ID" field
+        And I set the "Product Name" to "item_5"
+        And I set the "Product Quantity" to "5"
+        And I press the "Product Create" button
+        Then I should see the message "Product create Success"
+        When I press the "Product List" button
+        Then I should see "item_1" in the product results
+        And I should see "item_2" in the product results
+        And I should see "item_5" in the product results
