@@ -108,3 +108,19 @@ Feature: The wishlists service back-end
         And I press the "Product Retrieve" button
         Then I should see "item_1" in the "Product Name" field
         And I should see "5" in the "Product Quantity" field
+
+
+    Scenario: Copy a Wishlist
+        When I visit the "Home Page"
+        And I set the "Wishlist Name" to "wish_1"
+        And I press the "Search" button
+        Then I should see the message "Success"
+        When I copy the "Wishlist ID" field
+        And I press the "Clear" button
+        And I paste the "Wishlist ID" field
+        And I press the "Copy" button
+        Then I should see the message "Success"
+        When I press the "List" button
+        Then I should see the message "Success"
+        And I should see "wish_1 COPY" in the "Wishlist Name" field
+        And I should see "user_3" in the "User Name" field
