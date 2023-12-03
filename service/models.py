@@ -208,6 +208,18 @@ class Wishlist(db.Model, PersistentBase):
             ) from error
         return self
 
+    def find_product_by_name(self, product_name):
+        """Return the products by the name
+
+        Args:
+            product_name (_type_): the name of the products
+        """
+        results = []
+        for product in self.products:
+            if product.name == product_name:
+                results.append(product)
+        return results
+
     @classmethod
     def find_by_name(cls, name):
         """Returns all Wishlists with the given name

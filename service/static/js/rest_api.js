@@ -344,6 +344,50 @@ $(function () {
     });
 
     // ****************************************
+    // Search Products by Wishlist_id and Name
+    // ****************************************
+
+    $("#product-search-btn").click(function () {
+        let wishlist_id = $("#product_wishlist_id").val();
+        let product_name = $("#product_name").val();
+
+        $("#flash_message").empty();
+
+        query = "name=" + product_name;
+
+        let ajax = $.ajax({
+            type: "GET",
+            url: `/wishlists/${wishlist_id}/products?${query}`,
+            contentType: "application/json",
+            data: "",
+        });
+
+        ajax.done(function (res) {
+            $("#product_table_body").empty();
+            let tableContent = "";
+            res.forEach(function (products) {
+                tableContent += `<tr>
+                                    <td>${products.id}</td>
+                                    <td>${products.wishlist_id}</td>
+                                    <td>${products.name}</td>
+                                    <td>${products.quantity}</td>
+                                </tr>`;
+            });
+            $("#product_table_body").append(tableContent);
+            if (res.length > 0)
+            {
+                update_product_form_data(res[0]);
+            }
+            flash_message("Products Search Success!");
+        });
+
+        ajax.fail(function (res) {
+            flash_message("Failed to retrieve products: " + res.responseJSON.message);
+        });
+    });
+
+
+    // ****************************************
     // Create a Product
     // ****************************************
 

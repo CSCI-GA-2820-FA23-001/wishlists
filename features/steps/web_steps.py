@@ -87,11 +87,17 @@ def step_impl(context, element_name):
 ##################################################################
 @when('I copy the "{element_name}" field')
 def step_impl(context, element_name):
-    element_id = element_name.lower().replace(" ", "_")
-    element = WebDriverWait(context.driver, context.WAIT_SECONDS).until(
-        expected_conditions.presence_of_element_located((By.ID, element_id))
-    )
-    context.clipboard = element.get_attribute("value")
+    if element_name == "first cell of wishlist table":
+        element = WebDriverWait(context.driver, context.WAIT_SECONDS).until(
+            expected_conditions.presence_of_element_located((By.CSS_SELECTOR, "#wishlist_table_body tr:first-child td:first-child"))
+        )
+        context.clipboard = element.text
+    else:
+        element_id = element_name.lower().replace(" ", "_")
+        element = WebDriverWait(context.driver, context.WAIT_SECONDS).until(
+            expected_conditions.presence_of_element_located((By.ID, element_id))
+        )
+        context.clipboard = element.get_attribute("value")
     logging.info("Clipboard contains: %s", context.clipboard)
 
 
@@ -116,7 +122,8 @@ def step_impl(context, element_name):
 
 @when('I press the "{button}" button')
 def step_impl(context, button):
-    button_id = button.lower() + "-btn"
+    button_id = button.lower().replace(" ", "-") + "-btn"
+    print(button_id)
     context.driver.find_element_by_id(button_id).click()
 
 
