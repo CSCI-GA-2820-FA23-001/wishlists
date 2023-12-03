@@ -90,6 +90,24 @@ Feature: The wishlists service back-end
         And I should see "item_2" in the product results
         And I should not see "item_3" in the product results
 
+
+    Scenario:  Delete a product by name
+        When I visit the "Home Page"
+        And I set the "Wishlist Name" to "wish_12"
+        And I press the "create" button
+        Then I should see the message "Success"
+        When I copy the "Wishlist ID" field
+        And I press the "Clear" button
+        And I paste the "Product Wishlist Id" field
+        And I set the "Product Name" to "item_11"
+        And I set the "Product Quantity" to "11"
+        And I press the "product-create" button
+        Then I should see the message "Product create Success"
+        When I copy the "Product Id" field
+        And I paste the "Product Id" field
+        And I press the "product-delete" button
+        Then I should see the message "Products has been Deleted!"
+
     Scenario: Retrieve a Product in a Wishlist
         When I visit the "home page"
         And I set the "Wishlist Name" to "wish_1"
@@ -147,3 +165,4 @@ Feature: The wishlists service back-end
         Then I should see the message "Success"
         And I should see "new_wish_name" in the "Wishlist Name" field
         And I should see "new_user" in the "User Name" field
+
