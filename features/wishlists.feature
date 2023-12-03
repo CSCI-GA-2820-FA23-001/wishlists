@@ -124,3 +124,26 @@ Feature: The wishlists service back-end
         Then I should see the message "Success"
         And I should see "wish_1 COPY" in the "Wishlist Name" field
         And I should see "user_3" in the "User Name" field
+    
+    Scenario: Update a Wishlist
+        When I visit the "Home Page"
+        And I set the "Wishlist Name" to "wish_1"
+        And I press the "Search" button
+        Then I should see the message "Success"
+        When I copy the "Wishlist ID" field
+        And I press the "Clear" button
+        And I paste the "Wishlist ID" field
+        And I press the "Retrieve" button
+        Then I should see the message "Success"
+        And I should see "wish_1" in the "Wishlist Name" field
+        And I should see "user_3" in the "User Name" field
+        When I set the "Wishlist Name" to "new_wish_name"
+        And I set the "User Name" to "new_user"
+        And I press the "Update" button
+        Then I should see the message "Success" 
+        When I press the "Clear" button
+        And I paste the "Wishlist ID" field
+        And I press the "Retrieve" button
+        Then I should see the message "Success"
+        And I should see "new_wish_name" in the "Wishlist Name" field
+        And I should see "new_user" in the "User Name" field
