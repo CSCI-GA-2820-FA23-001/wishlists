@@ -76,13 +76,13 @@ create_wishlist_model = api.model(
     "Wishlist",
     {
         "name": fields.String(required=True, description="The name of the wishlist"),
+        "owner": fields.String(required=True, description="The owner of the wishlist"),
         "date_joined": fields.Date(
             required=True,
-            description="The date the wishlist is created",
+            description="The date when the wishlist is created",
         ),
-        "owner": fields.String(required=True, description="The owner of the wishlist"),
         "products": fields.List(
-            fields.Raw(product_model),
+            fields.Nested(product_model),
             required=False,
             description="The products that belongs to the wishlist",
         ),
@@ -139,23 +139,24 @@ product_args.add_argument(
 ######################################################################
 # Authorization Decorator
 ######################################################################
-def token_required(func):
-    """Decorator to require a token for this endpoint"""
+# def token_required(func):
+#     """Decorator to require a token for this endpoint"""
 
-    @wraps(func)
-    def decorated(*args, **kwargs):
-        token = None
-        if "X-Api-Key" in request.headers:
-            token = request.headers["X-Api-Key"]
-            print("token")
+#     @wraps(func)
+#     def decorated(*args, **kwargs):
+#         token = None
+#         if "X-Api-Key" in request.headers:
+#             token = request.headers["X-Api-Key"]
+#             app.logger.info("token: %s", token)
+#             app.logger.info("apikey: %s", app.config["API_KEY"])
 
-        if app.config.get("API_KEY") and app.config["API_KEY"] == token:
-            print("valid")
-            return func(*args, **kwargs)
+#         if app.config.get("API_KEY") and app.config["API_KEY"] == token:
+#             return func(*args, **kwargs)
 
-        return {"message": "Invalid or missing token"}, 401
+        
+#         return {"message": "Invalid or missing token"}, 401
 
-    return decorated
+#     return decorated
 
 
 ######################################################################
@@ -223,15 +224,17 @@ class WishlistCollection(Resource):
     @api.response(400, "The posted data was not valid")
     @api.expect(create_wishlist_model)
     @api.marshal_with(wishlist_model, code=201)
-    @token_required
+    #@token_required
     def post(self):
         """create an empty wishlist with post method"""
+        app.logger.info("Request for creating a wishlist")
         new_list = Wishlist()
         new_list.deserialize(api.payload)
         new_list.create()
         message = new_list.serialize()
+        app.logger.info("Wishlist created with id: %d", message["id"])
 
-        location_url = url_for("get_wishlists", wishlist_id=new_list.id, _external=True)  # need to be updated after refactoring done
+        location_url = url_for("get_wishlists", wishlist_id=new_list.id, _external=True)  # needs to be updated after refactoring done
 
         return message, status.HTTP_201_CREATED, {"Location": location_url}
 

@@ -25,17 +25,13 @@ For information on Waiting until elements are present in the HTML see:
 import requests
 from behave import given
 from compare import expect
-from service import app
 
 
 @given("the following wishlists")
 def step_impl(context):
     """Delete all Wishlists and load new ones"""
     # List all of the wishlists and delete them one by one
-    headers = {"X-Api-Key": app.config["API_KEY"]}
-    print(headers["X-Api-Key"])
-    print(app.config["API_KEY"])
-    
+    headers = {"X-Api-Key": context.API_KEY}
     rest_endpoint = f"{context.BASE_URL}/api/wishlists"
     context.resp = requests.get(rest_endpoint)
     expect(context.resp.status_code).to_equal(200)
@@ -67,7 +63,7 @@ def step_impl(context):
     """Load new wishlist items, delete wishlists already deleted all items"""
     # List all of the wishlist items and delete them one by one
     # load the database with new wishlist items
-    headers = {"X-Api-Key": app.config["API_KEY"]}
+    headers = {"X-Api-Key": context.API_KEY}
     for row in context.table:
         wishlist_name = row["wishlist_name"]
         queryString = "name=" + wishlist_name
