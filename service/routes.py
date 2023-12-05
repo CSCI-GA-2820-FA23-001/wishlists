@@ -7,7 +7,7 @@ import secrets
 from functools import wraps
 from datetime import date, datetime
 from flask import jsonify, request, url_for, abort, make_response
-from flask_restx import Resource, fields, reqparse, inputs
+from flask_restx import fields, reqparse
 from service.common import status  # HTTP Status Codes
 from service.models import Product, Wishlist
 
@@ -333,14 +333,11 @@ def create_products(wishlist_id):
     # Create the product
     new_product = Product()
     info = request.get_json()
+    if info["wishlist_id"] != wishlist.id:
+        info["wishlist_id"] = wishlist.id  # Update wishlist_id if not consistent
     new_product.deserialize(info)
     new_product.wishlist = wishlist
     new_product.create()
-
-    # Update wishlist_id if not consistent
-    if new_product.wishlist_id and new_product.wishlist_id != wishlist_id:
-        new_product.wishlist_id = wishlist_id
-        new_product.update()
 
     # wishlist.products.append(new_product)
     wishlist.update()
@@ -465,12 +462,13 @@ def copy_wishlist_by_id(wishlist_id):
     """
     COPY AN EXISTING Wishlist with an id
     """
-    old = Wishlist.find(wishlist_id).serialize()
-    if not old:
+    old_wishlist = Wishlist.find(wishlist_id)
+    if not old_wishlist:
         abort(
             status.HTTP_404_NOT_FOUND,
             f"Wishlist {wishlist_id} not exist",
         )
+    old = old_wishlist.serialize()
 
     new = {}
     for key, val in old.items():

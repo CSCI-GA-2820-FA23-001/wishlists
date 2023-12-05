@@ -8,13 +8,12 @@ import os
 import sys
 import logging
 from flask import Flask
+from flask_restx import Api
 from service import config
 from service.common import log_handlers
 
 # Create Flask application
 app = Flask(__name__)
-
-from flask_restx import Api
 
 # Document the type of authorization required
 authorizations = {"apikey": {"type": "apiKey", "in": "header", "name": "X-Api-Key"}}
