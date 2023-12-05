@@ -25,17 +25,25 @@ For information on Waiting until elements are present in the HTML see:
 import requests
 from behave import given
 from compare import expect
+from service import app
 
 
 @given("the following wishlists")
 def step_impl(context):
     """Delete all Wishlists and load new ones"""
     # List all of the wishlists and delete them one by one
-    rest_endpoint = f"{context.BASE_URL}/wishlists"
+    headers = {"X-Api-Key": app.config["API_KEY"]}
+    print(headers["X-Api-Key"])
+    print(app.config["API_KEY"])
+    
+    rest_endpoint = f"{context.BASE_URL}/api/wishlists"
     context.resp = requests.get(rest_endpoint)
     expect(context.resp.status_code).to_equal(200)
     for wishlist in context.resp.json():
-        context.resp = requests.delete(f"{rest_endpoint}/{wishlist['id']}")
+        context.resp = requests.delete(
+            f"{rest_endpoint}/{wishlist['id']}",
+            headers=headers,
+        )
         expect(context.resp.status_code).to_equal(204)
 
     # load the database with new wishlists
@@ -46,7 +54,11 @@ def step_impl(context):
             "date_joined": row["date"],
             "products": [],
         }
-        context.resp = requests.post(rest_endpoint, json=payload)
+        context.resp = requests.post(
+            rest_endpoint, 
+            json=payload,
+            headers=headers,
+        )
         expect(context.resp.status_code).to_equal(201)
 
 
@@ -55,10 +67,11 @@ def step_impl(context):
     """Load new wishlist items, delete wishlists already deleted all items"""
     # List all of the wishlist items and delete them one by one
     # load the database with new wishlist items
+    headers = {"X-Api-Key": app.config["API_KEY"]}
     for row in context.table:
         wishlist_name = row["wishlist_name"]
         queryString = "name=" + wishlist_name
-        rest_endpoint = f"{context.BASE_URL}/wishlists?{queryString}"
+        rest_endpoint = f"{context.BASE_URL}/api/wishlists?{queryString}"
         context.resp = requests.get(rest_endpoint)
         print(context.resp.json())
         wishlist_id = context.resp.json()[0]["id"]
@@ -68,8 +81,12 @@ def step_impl(context):
             "wishlist_id": wishlist_id,
             "quantity": int(row["quantity"]),
         }
-        endpoint = f"{context.BASE_URL}/wishlists/{wishlist_id}/products"
+        endpoint = f"{context.BASE_URL}/api/wishlists/{wishlist_id}/products"
         print(endpoint)
-        context.resp = requests.post(endpoint, json=payload)
+        context.resp = requests.post(
+            endpoint, 
+            json=payload,
+            headers=headers,
+        )
         print(context.resp.json())
         expect(context.resp.status_code).to_equal(201)

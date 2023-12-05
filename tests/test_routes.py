@@ -122,6 +122,10 @@ class TestWishlistServer(TestCase):
             )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
+        # Make sure location header is set
+        location = response.headers.get("Location", None)
+        self.assertIsNotNone(location)
+
         res = response.get_json()
         self.assertEqual(res["owner"], test_list.owner)
         self.assertEqual(res["name"], test_list.name)

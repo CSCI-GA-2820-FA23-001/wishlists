@@ -147,8 +147,10 @@ def token_required(func):
         token = None
         if "X-Api-Key" in request.headers:
             token = request.headers["X-Api-Key"]
+            print("token")
 
         if app.config.get("API_KEY") and app.config["API_KEY"] == token:
+            print("valid")
             return func(*args, **kwargs)
 
         return {"message": "Invalid or missing token"}, 401
@@ -229,7 +231,7 @@ class WishlistCollection(Resource):
         new_list.create()
         message = new_list.serialize()
 
-        location_url = url_for("get_wishlists", wishlist_id=new_list.id, _external=True)
+        location_url = url_for("get_wishlists", wishlist_id=new_list.id, _external=True)  # need to be updated after refactoring done
 
         return message, status.HTTP_201_CREATED, {"Location": location_url}
 
