@@ -3,19 +3,11 @@ Models for Wishlist
 
 All of the models are stored in this module
 """
-import os
 import logging
 from datetime import date
 from abc import abstractmethod
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import and_
-from retry import retry
-from requests import HTTPError, ConnectionError  # pylint: disable=redefined-builtin
-
-# global variables for retry (must be int)
-RETRY_COUNT = int(os.environ.get("RETRY_COUNT", 10))
-RETRY_DELAY = int(os.environ.get("RETRY_DELAY", 1))
-RETRY_BACKOFF = int(os.environ.get("RETRY_BACKOFF", 2))
 
 logger = logging.getLogger("flask.app")
 
@@ -276,16 +268,3 @@ class Wishlist(db.Model, PersistentBase):
         if end:
             return cls.query.filter(cls.date_joined <= end)
         return cls.all()
-
-    @classmethod
-    @retry(
-        HTTPError,
-        delay=RETRY_DELAY,
-        backoff=RETRY_BACKOFF,
-        tries=RETRY_COUNT,
-        logger=logger,
-    )
-    def remove_all(cls):
-        """Removes all documents from the database (use for testing)"""
-        for document in cls.database:  # pylint: disable=(not-an-iterable
-            document.delete()

@@ -4,10 +4,9 @@ Wishlist Service
 Wishlist service for shopping
 """
 import secrets
-from functools import wraps
 from datetime import date, datetime
 from flask import jsonify, request, url_for, abort, make_response
-from flask_restx import Resource, fields, reqparse, inputs
+from flask_restx import Resource, fields, reqparse  # , inputs
 from service.common import status  # HTTP Status Codes
 from service.models import Product, Wishlist
 
@@ -147,13 +146,10 @@ product_args.add_argument(
 #         token = None
 #         if "X-Api-Key" in request.headers:
 #             token = request.headers["X-Api-Key"]
-#             app.logger.info("token: %s", token)
-#             app.logger.info("apikey: %s", app.config["API_KEY"])
 
 #         if app.config.get("API_KEY") and app.config["API_KEY"] == token:
 #             return func(*args, **kwargs)
 
-        
 #         return {"message": "Invalid or missing token"}, 401
 
 #     return decorated
@@ -173,7 +169,7 @@ def generate_apikey():
 @api.route("/wishlists", strict_slashes=False)
 class WishlistCollection(Resource):
     """Handles all interactions with collections of Wishlists
-    
+
     APIs:
     GET     /wishlists  List all wishlists
     POST    /wishlists  Create a wishlist
@@ -224,7 +220,7 @@ class WishlistCollection(Resource):
     @api.response(400, "The posted data was not valid")
     @api.expect(create_wishlist_model)
     @api.marshal_with(wishlist_model, code=201)
-    #@token_required
+    # @token_required
     def post(self):
         """create an empty wishlist with post method"""
         app.logger.info("Request for creating a wishlist")
@@ -234,7 +230,8 @@ class WishlistCollection(Resource):
         message = new_list.serialize()
         app.logger.info("Wishlist created with id: %d", message["id"])
 
-        location_url = url_for("get_wishlists", wishlist_id=new_list.id, _external=True)  # needs to be updated after refactoring done
+        # needs to be updated after refactoring done
+        location_url = url_for("get_wishlists", wishlist_id=new_list.id, _external=True)
 
         return message, status.HTTP_201_CREATED, {"Location": location_url}
 
