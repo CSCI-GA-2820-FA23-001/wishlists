@@ -1,3 +1,5 @@
+const BASE_URL = "/api/wishlists"
+
 function getCurrentDate() {
     var today = new Date();
     var year = today.getFullYear();
@@ -56,7 +58,7 @@ $(function () {
             queryString += (queryString ? '&' : '') + 'end=' + end_date;
         }
 
-        let url = "/wishlists";
+        let url = BASE_URL;
         if (queryString) {
             url += "?" + queryString;
         }
@@ -117,7 +119,7 @@ $(function () {
 
         let ajax = $.ajax({
             type: "POST",
-            url: "/wishlists",
+            url: BASE_URL,
             contentType: "application/json",
             data: JSON.stringify(data),
         });
@@ -145,7 +147,7 @@ $(function () {
 
         let ajax = $.ajax({
             type: "GET",
-            url: `/wishlists?${query}`,
+            url: `${BASE_URL}?${query}`,
             contentType: "application/json",
             data: "",
         });
