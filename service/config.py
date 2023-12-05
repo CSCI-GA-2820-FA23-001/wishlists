@@ -14,3 +14,6 @@ SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 # Secret for session management
 SECRET_KEY = os.getenv("SECRET_KEY", "s3cr3t-key-shhhh")
+
+# API key
+API_KEY = os.getenv("API_KEY")

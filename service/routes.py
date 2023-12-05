@@ -3,21 +3,24 @@ Wishlist Service
 
 Wishlist service for shopping
 """
+import secrets
+from functools import wraps
 from datetime import date, datetime
 from flask import jsonify, request, url_for, abort, make_response
+from flask_restx import Resource, fields, reqparse, inputs
 from service.common import status  # HTTP Status Codes
 from service.models import Product, Wishlist
 
 
 # Import Flask application
-from . import app
+from . import app, api
 
 BASE_URL = "/wishlists"
+
+
 ############################################################
 # Health Endpoint
 ############################################################
-
-
 @app.route("/health")
 def health():
     """Health Status"""
@@ -25,11 +28,11 @@ def health():
 
 
 ######################################################################
-# GET INDEX
+# Configure the Root route before OpenAPI
 ######################################################################
 @app.route("/")
 def index():
-    """Base URL for our service"""
+    """Index page"""
     return app.send_static_file("index.html")
 
     # """Root URL response"""
@@ -41,6 +44,124 @@ def index():
     #     ),
     #     status.HTTP_200_OK,
     # )
+
+
+# Define the model so that the docs reflect what can be sent
+
+create_product_model = api.model(
+    "Product",
+    {
+        "name": fields.String(required=True, description="The name of the product"),
+        "wishlist_id": fields.Integer(
+            required=True, description="The wishlist ID that the product belongs to"
+        ),
+        "quantity": fields.Integer(
+            required=True, description="The quantity of the product"
+        ),
+    },
+)
+
+product_model = api.inherit(
+    "ProductModel",
+    create_product_model,
+    {
+        "_id": fields.Integer(
+            readOnly=True,
+            description="The unique id assigned to the product internally by service",
+        ),
+    },
+)
+
+create_wishlist_model = api.model(
+    "Wishlist",
+    {
+        "name": fields.String(required=True, description="The name of the wishlist"),
+        "date_joined": fields.Date(
+            required=True,
+            description="The date the wishlist is created",
+        ),
+        "owner": fields.String(required=True, description="The owner of the wishlist"),
+        "products": fields.List(
+            fields.Raw(product_model),
+            required=False,
+            description="The products that belongs to the wishlist",
+        ),
+    },
+)
+
+wishlist_model = api.inherit(
+    "WishlistModel",
+    create_wishlist_model,
+    {
+        "_id": fields.Integer(
+            readOnly=True,
+            description="The unique id assigned to the wishlist internally by service",
+        ),
+    },
+)
+
+# query string arguments
+wishlist_args = reqparse.RequestParser()
+wishlist_args.add_argument(
+    "name", type=str, location="args", required=False, help="List Wishlists by name"
+)
+wishlist_args.add_argument(
+    "owner", type=str, location="args", required=False, help="List Wishlists by owner"
+)
+wishlist_args.add_argument(
+    "start",
+    type=str,
+    location="args",
+    required=False,
+    help="List Pets by start-date filter",
+)
+wishlist_args.add_argument(
+    "end",
+    type=str,
+    location="args",
+    required=False,
+    help="List Pets by end-date filter",
+)
+
+product_args = reqparse.RequestParser()
+product_args.add_argument(
+    "wishlist_id",
+    type=int,
+    location="args",
+    required=True,
+    help="List Products by wishlist_id",
+)
+product_args.add_argument(
+    "name", type=str, location="args", required=True, help="List Products by name"
+)
+
+
+######################################################################
+# Authorization Decorator
+######################################################################
+def token_required(func):
+    """Decorator to require a token for this endpoint"""
+
+    @wraps(func)
+    def decorated(*args, **kwargs):
+        token = None
+        if "X-Api-Key" in request.headers:
+            token = request.headers["X-Api-Key"]
+
+        if app.config.get("API_KEY") and app.config["API_KEY"] == token:
+            return func(*args, **kwargs)
+
+        return {"message": "Invalid or missing token"}, 401
+
+    return decorated
+
+
+######################################################################
+# Function to generate a random API key (good for testing)
+######################################################################
+def generate_apikey():
+    """Helper function used when testing API keys"""
+    return secrets.token_hex(16)
 
 
 ######################################################################
