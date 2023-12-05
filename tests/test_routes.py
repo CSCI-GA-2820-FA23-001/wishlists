@@ -9,13 +9,14 @@ Test cases can be run with the following:
 import logging
 from unittest import TestCase
 from datetime import date
-from service import app
+from service import app, routes
 from service.models import db, Wishlist, Product
 from service.common import status  # HTTP Status Codes
 from tests.factories import WishlistFactory, ProductFactory
 
 
-BASE_URL = "/wishlists"
+BASE_URL = "/api/wishlists"
+CONTENT_TYPE_JSON = "application/json"
 
 
 ######################################################################
@@ -28,6 +29,10 @@ class TestWishlistServer(TestCase):
     @classmethod
     def setUpClass(cls):
         """This runs once before the entire test suite"""
+        app.config["TESTING"] = True
+        api_key = routes.generate_apikey()
+        app.config["API_KEY"] = api_key
+        app.logger.setLevel(logging.CRITICAL)
 
     @classmethod
     def tearDownClass(cls):
@@ -35,6 +40,8 @@ class TestWishlistServer(TestCase):
 
     def setUp(self):
         """This runs before each test"""
+        self.app = app.test_client()
+        self.headers = {"X-Api-Key": app.config["API_KEY"]}
         db.session.query(Wishlist).delete()  # clean up the last tests
         db.session.query(Product).delete()  # clean up the last tests
         db.session.commit()
@@ -52,7 +59,12 @@ class TestWishlistServer(TestCase):
         wishlists = []
         for _ in range(count):
             wishlist = WishlistFactory()
-            resp = self.client.post(BASE_URL, json=wishlist.serialize())
+            resp = self.client.post(
+                BASE_URL,
+                json=wishlist.serialize(),
+                content_type=CONTENT_TYPE_JSON,
+                headers=self.headers,
+            )
             self.assertEqual(
                 resp.status_code,
                 status.HTTP_201_CREATED,
@@ -69,7 +81,9 @@ class TestWishlistServer(TestCase):
         for _ in range(count):
             product = ProductFactory(wishlist_id=wishlist_id)
             resp = self.client.post(
-                f"{BASE_URL}/{wishlist_id}/products", json=product.serialize()
+                f"{BASE_URL}/{wishlist_id}/products",
+                json=product.serialize(),
+                headers=self.headers,
             )
             self.assertEqual(
                 resp.status_code,
@@ -98,8 +112,17 @@ class TestWishlistServer(TestCase):
         """It should create a wishlist"""
         test_list = WishlistFactory()
         logging.debug("Test wishlist: %s", test_list.serialize())
-        response = self.client.post(BASE_URL, json=test_list.serialize())
+        response = self.client.post(
+            BASE_URL,
+            json=test_list.serialize(),
+            content_type=CONTENT_TYPE_JSON,
+            headers=self.headers,
+        )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        # Make sure location header is set
+        location = response.headers.get("Location", None)
+        self.assertIsNotNone(location)
 
         res = response.get_json()
         self.assertEqual(res["owner"], test_list.owner)
@@ -387,7 +410,7 @@ class TestWishlistServer(TestCase):
         """It should Update an existing Wishlist"""
         # create an Wishlist to update
         test_wishlist = WishlistFactory()
-        resp = self.client.post(BASE_URL, json=test_wishlist.serialize())
+        resp = self.client.post(BASE_URL, json=test_wishlist.serialize(), headers=self.headers)
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
 
         # update the pet
@@ -429,14 +452,21 @@ class TestWishlistServer(TestCase):
     ######################################################################
     def test_bad_request(self):
         """It should not Create when sending the wrong data"""
-        resp = self.client.post(BASE_URL, json={"name": "not enough data"})
+        resp = self.client.post(
+            BASE_URL,
+            json={"name": "not enough data"},
+            headers=self.headers,
+        )
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_unsupported_media_type(self):
         """It should not Create when sending wrong media type"""
         wishlist = WishlistFactory()
         resp = self.client.post(
-            BASE_URL, json=wishlist.serialize(), content_type="test/html"
+            BASE_URL,
+            json=wishlist.serialize(),
+            content_type="test/html",
+            headers=self.headers,
         )
         self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
 

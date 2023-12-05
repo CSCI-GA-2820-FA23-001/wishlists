@@ -1,3 +1,5 @@
+const BASE_URL = "/api"
+
 function getCurrentDate() {
     var today = new Date();
     var year = today.getFullYear();
@@ -56,7 +58,7 @@ $(function () {
             queryString += (queryString ? '&' : '') + 'end=' + end_date;
         }
 
-        let url = "/wishlists";
+        let url = BASE_URL + "/wishlists";
         if (queryString) {
             url += "?" + queryString;
         }
@@ -117,7 +119,7 @@ $(function () {
 
         let ajax = $.ajax({
             type: "POST",
-            url: "/wishlists",
+            url: `${BASE_URL}/wishlists`,
             contentType: "application/json",
             data: JSON.stringify(data),
         });
@@ -145,7 +147,7 @@ $(function () {
 
         let ajax = $.ajax({
             type: "GET",
-            url: `/wishlists?${query}`,
+            url: `${BASE_URL}/wishlists?${query}`,
             contentType: "application/json",
             data: "",
         });
@@ -183,7 +185,7 @@ $(function () {
 
         let ajax = $.ajax({
             type: "PUT",
-            url: `/wishlists/${wishlist_id}`,
+            url: `${BASE_URL}/wishlists/${wishlist_id}`,
             contentType: "application/json",
             data: JSON.stringify(data)
         })
@@ -210,7 +212,7 @@ $(function () {
 
         let ajax = $.ajax({
             type: "GET",
-            url: `/wishlists/${wishlist_id}`,
+            url: `${BASE_URL}/wishlists/${wishlist_id}`,
             contentType: "application/json",
             data: ''
         })
@@ -239,7 +241,7 @@ $(function () {
 
         let ajax = $.ajax({
             type: "POST",
-            url: `/wishlists/${wishlist_id}/copy`,
+            url: `${BASE_URL}/wishlists/${wishlist_id}/copy`,
             contentType: "application/json",
             data: ''
         })
@@ -263,7 +265,7 @@ $(function () {
 
         let ajax = $.ajax({
             type: "DELETE",
-            url: `/wishlists/${wishlist_id}`,
+            url: `${BASE_URL}/wishlists/${wishlist_id}`,
             contentType: "application/json",
             data: '',
         })
@@ -318,7 +320,7 @@ $(function () {
 
         let ajax = $.ajax({
             type: "GET",
-            url: `/wishlists/${wishlist_id}/products`,
+            url: `${BASE_URL}/wishlists/${wishlist_id}/products`,
             contentType: "application/json",
             data: "",
         });
@@ -357,7 +359,7 @@ $(function () {
 
         let ajax = $.ajax({
             type: "GET",
-            url: `/wishlists/${wishlist_id}/products?${query}`,
+            url: `${BASE_URL}/wishlists/${wishlist_id}/products?${query}`,
             contentType: "application/json",
             data: "",
         });
@@ -410,7 +412,7 @@ $(function () {
 
         let ajax = $.ajax({
             type: "POST",
-            url: `/wishlists/${wishlist_id}/products`,
+            url: `${BASE_URL}/wishlists/${wishlist_id}/products`,
             contentType: "application/json",
             data: JSON.stringify(data),
         });
@@ -446,7 +448,7 @@ $(function () {
 
         let ajax = $.ajax({
             type: "PUT",
-            url: `/wishlists/${wishlist_id}/products/${product_id}`,
+            url: `${BASE_URL}/wishlists/${wishlist_id}/products/${product_id}`,
             contentType: "application/json",
             data: JSON.stringify(data)
         })
@@ -474,7 +476,7 @@ $(function () {
 
         let ajax = $.ajax({
             type: "GET",
-            url: `/wishlists/${wishlist_id}/products/${product_id}`,
+            url: `${BASE_URL}/wishlists/${wishlist_id}/products/${product_id}`,
             contentType: "application/json",
             data: ''
         })
@@ -504,7 +506,7 @@ $(function () {
 
         let ajax = $.ajax({
             type: "DELETE",
-            url: `/wishlists/${wishlist_id}/products/${product_id}`,
+            url: `${BASE_URL}/wishlists/${wishlist_id}/products/${product_id}`,
             contentType: "application/json",
             data: '',
         })

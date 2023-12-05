@@ -4,10 +4,9 @@ Wishlist Service
 Wishlist service for shopping
 """
 import secrets
-from functools import wraps
 from datetime import date, datetime
 from flask import jsonify, request, url_for, abort, make_response
-from flask_restx import fields, reqparse
+from flask_restx import Resource, fields, reqparse  # , inputs
 from service.common import status  # HTTP Status Codes
 from service.models import Product, Wishlist
 
@@ -15,7 +14,7 @@ from service.models import Product, Wishlist
 # Import Flask application
 from . import app, api
 
-BASE_URL = "/wishlists"
+BASE_URL = "/api/wishlists"
 
 
 ############################################################
@@ -65,7 +64,7 @@ product_model = api.inherit(
     "ProductModel",
     create_product_model,
     {
-        "_id": fields.Integer(
+        "id": fields.Integer(
             readOnly=True,
             description="The unique id assigned to the product internally by service",
         ),
@@ -76,13 +75,13 @@ create_wishlist_model = api.model(
     "Wishlist",
     {
         "name": fields.String(required=True, description="The name of the wishlist"),
+        "owner": fields.String(required=True, description="The owner of the wishlist"),
         "date_joined": fields.Date(
             required=True,
-            description="The date the wishlist is created",
+            description="The date when the wishlist is created",
         ),
-        "owner": fields.String(required=True, description="The owner of the wishlist"),
         "products": fields.List(
-            fields.Raw(product_model),
+            fields.Nested(product_model),
             required=False,
             description="The products that belongs to the wishlist",
         ),
@@ -93,7 +92,7 @@ wishlist_model = api.inherit(
     "WishlistModel",
     create_wishlist_model,
     {
-        "_id": fields.Integer(
+        "id": fields.Integer(
             readOnly=True,
             description="The unique id assigned to the wishlist internally by service",
         ),
@@ -132,28 +131,28 @@ product_args.add_argument(
     help="List Products by wishlist_id",
 )
 product_args.add_argument(
-    "name", type=str, location="args", required=True, help="List Products by name"
+    "name", type=str, location="args", required=False, help="List Products by name"
 )
 
 
 ######################################################################
 # Authorization Decorator
 ######################################################################
-def token_required(func):
-    """Decorator to require a token for this endpoint"""
+# def token_required(func):
+#     """Decorator to require a token for this endpoint"""
 
-    @wraps(func)
-    def decorated(*args, **kwargs):
-        token = None
-        if "X-Api-Key" in request.headers:
-            token = request.headers["X-Api-Key"]
+#     @wraps(func)
+#     def decorated(*args, **kwargs):
+#         token = None
+#         if "X-Api-Key" in request.headers:
+#             token = request.headers["X-Api-Key"]
 
-        if app.config.get("API_KEY") and app.config["API_KEY"] == token:
-            return func(*args, **kwargs)
+#         if app.config.get("API_KEY") and app.config["API_KEY"] == token:
+#             return func(*args, **kwargs)
 
-        return {"message": "Invalid or missing token"}, 401
+#         return {"message": "Invalid or missing token"}, 401
 
-    return decorated
+#     return decorated
 
 
 ######################################################################
@@ -165,55 +164,76 @@ def generate_apikey():
 
 
 ######################################################################
-# LIST ALL wishlist
+#  PATH: /wishlists
 ######################################################################
-@app.route(BASE_URL, methods=["GET"])
-def list_wishlists():
-    """Returns all of the wishlists. If there is a date filter, return filtered wishlists"""
-    app.logger.info("Request for listing all wishlists")
+@api.route("/wishlists", strict_slashes=False)
+class WishlistCollection(Resource):
+    """Handles all interactions with collections of Wishlists
 
-    # Get query args
-    owner = request.args.get("owner")
-    start = request.args.get("start")
-    end = request.args.get("end")
-    name = request.args.get("name")
+    APIs:
+    GET     /wishlists  List all wishlists
+    POST    /wishlists  Create a wishlist
+    """
 
-    # Process the query string if any
+    # ------------------------------------------------------------------
+    # LIST ALL WISHLISTS
+    # ------------------------------------------------------------------
+    @api.doc("list_wishlists")
+    @api.expect(wishlist_args, validate=True)
+    @api.marshal_list_with(wishlist_model)
+    def get(self):
+        """Returns all of the wishlists. If there is a date filter, return filtered wishlists"""
+        app.logger.info("Request for listing all wishlists")
 
-    if owner:
-        accounts = Wishlist.find_by_owner(owner)
-    elif name:
-        accounts = Wishlist.find_by_name(name)
-    elif start or end:
-        # filter by start and end date
-        start_date = None
-        end_date = None
-        if start:
-            start_date = datetime.strptime(start, "%Y-%m-%d").date()
-        if end:
-            end_date = datetime.strptime(end, "%Y-%m-%d").date()
-        accounts = Wishlist.filter_by_date(start_date, end_date)
-    else:
-        accounts = Wishlist.all()
+        # Get query args
+        args = wishlist_args.parse_args()
+        owner = args["owner"]
+        start = args["start"]
+        end = args["end"]
+        name = args["name"]
 
-    results = [account.serialize() for account in accounts]
-    return make_response(jsonify(results), status.HTTP_200_OK)
+        # Process the query string if any
 
+        if owner:
+            accounts = Wishlist.find_by_owner(owner)
+        elif name:
+            accounts = Wishlist.find_by_name(name)
+        elif start or end:
+            # filter by start and end date
+            start_date = None
+            end_date = None
+            if start:
+                start_date = datetime.strptime(start, "%Y-%m-%d").date()
+            if end:
+                end_date = datetime.strptime(end, "%Y-%m-%d").date()
+            accounts = Wishlist.filter_by_date(start_date, end_date)
+        else:
+            accounts = Wishlist.all()
 
-######################################################################
-# CREATE A wishlist
-######################################################################
-@app.route(BASE_URL, methods=["POST"])
-def create_wishlist():
-    """create an empty wishlist with post method"""
-    new_list = Wishlist()
-    new_list.deserialize(request.get_json())
-    new_list.create()
-    message = new_list.serialize()
+        results = [account.serialize() for account in accounts]
+        return results, status.HTTP_200_OK
 
-    location_url = url_for("get_wishlists", wishlist_id=new_list.id, _external=True)
+    # ------------------------------------------------------------------
+    # CREATE A NEW WISHLIST
+    # ------------------------------------------------------------------
+    @api.doc("create_wishlists", security="apikey")
+    @api.response(400, "The posted data was not valid")
+    @api.expect(create_wishlist_model)
+    @api.marshal_with(wishlist_model, code=201)
+    # @token_required
+    def post(self):
+        """create an empty wishlist with post method"""
+        app.logger.info("Request for creating a wishlist")
+        new_list = Wishlist()
+        new_list.deserialize(api.payload)
+        new_list.create()
+        message = new_list.serialize()
+        app.logger.info("Wishlist created with id: %d", message["id"])
 
-    return jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
+        # needs to be updated after refactoring done
+        location_url = url_for("get_wishlists", wishlist_id=new_list.id, _external=True)
+
+        return message, status.HTTP_201_CREATED, {"Location": location_url}
 
 
 ######################################################################
@@ -239,7 +259,7 @@ def get_wishlists(wishlist_id):
 ######################################################################
 # UPDATE AN EXISTING Wishlist
 ######################################################################
-@app.route("/wishlists/<int:wishlist_id>", methods=["PUT"])
+@app.route(f"{BASE_URL}/<int:wishlist_id>", methods=["PUT"])
 def update_wishlists_by_name(wishlist_id):
     """
     Update an Wishlist
