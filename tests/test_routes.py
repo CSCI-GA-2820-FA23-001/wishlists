@@ -139,7 +139,7 @@ class TestWishlistServer(TestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-    def test_get_product_list(self):
+    def test_list_product(self):
         """It should Get a list of Products"""
         # add two products to wishlist
         wishlist = self._create_wishlists(1)[0]
@@ -168,7 +168,12 @@ class TestWishlistServer(TestCase):
             f"{BASE_URL}/{wishlist.id}/products?name={wishlist.products[0].name}"
         )
         data = resp.get_json()[0]
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(data["name"], wishlist.products[0].name)
+
+        # test wishlist not exist
+        resp = self.client.get(f"{BASE_URL}/0/products")
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_get_product(self):
         """It should Get an product from an wishlist"""
@@ -198,6 +203,13 @@ class TestWishlistServer(TestCase):
         self.assertEqual(data["wishlist_id"], test_wishlist.id)
         self.assertEqual(data["name"], test_product.name)
 
+        # if product not exist
+        resp = self.client.get(
+            f"{BASE_URL}/{test_wishlist.id}/products/0",
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
     def test_update_product(self):
         """It should update the name and quantity of a product"""
         test_wishlist = self._create_wishlists(1)[0]
@@ -213,6 +225,14 @@ class TestWishlistServer(TestCase):
         data = resp.get_json()
         self.assertEqual(test_product.name, data["name"])
         self.assertEqual(test_product.quantity, data["quantity"])
+
+        # info not consistent
+        info["wishlist_id"] = 0
+        resp = self.client.put(
+            f"{BASE_URL}/{test_wishlist.id}/products/{test_product.id}",
+            json=info,
+        )
+        self.assertEqual(resp.status_code, status.HTTP_409_CONFLICT)
 
     def test_update_product_not_contain(self):
         """It should update the product if not contained in given wishlist"""
@@ -379,6 +399,9 @@ class TestWishlistServer(TestCase):
         updated_wishlist = resp.get_json()
         self.assertEqual(updated_wishlist["name"], "nyu-wishlist")
 
+        resp = self.client.put(f"{BASE_URL}/0", json=new_wishlist)
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
     def test_copy_a_wishlist(self):
         """It should copy an existing Wishlist"""
         wishlists = self._create_wishlists(1)
@@ -396,6 +419,10 @@ class TestWishlistServer(TestCase):
         self.assertNotEqual(data["id"], old_wishlist.id)
         self.assertEqual(data["name"], old_wishlist.name + " COPY")
         self.assertEqual(len(data["products"]), 2)
+
+        # if old wishlist does not exist
+        resp = self.client.post(f"{BASE_URL}/0/copy")
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
     ######################################################################
     #  E R R O R    H A N D L E R   T E S T
