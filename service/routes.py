@@ -257,7 +257,7 @@ class WishlistResource(Resource):
         app.logger.info("Request to Retrieve a wishlist with id [%s]", wishlist_id)
         wishlist = Wishlist.find(wishlist_id)
         if not wishlist:
-            abort(status.HTTP_404_NOT_FOUND, "Wishlist with id '{}' was not found.".format(wishlist_id))
+            abort(status.HTTP_404_NOT_FOUND, f"Wishlist with id '{wishlist_id}' could not be found.")
         return wishlist.serialize(), status.HTTP_200_OK
 
     # ------------------------------------------------------------------
@@ -278,7 +278,7 @@ class WishlistResource(Resource):
         app.logger.info('Request to Update a wishlist with id [%s]', wishlist_id)
         wishlist = Wishlist.find(wishlist_id)
         if not wishlist:
-            abort(status.HTTP_404_NOT_FOUND, "Wishlist with id '{}' was not found.".format(wishlist_id))
+            abort(status.HTTP_404_NOT_FOUND, f"Wishlist with id '{wishlist_id}' could not be found.")
         app.logger.debug('Payload = %s', api.payload)
         data = api.payload
         wishlist.deserialize(data)
