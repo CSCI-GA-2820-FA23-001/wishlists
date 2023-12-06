@@ -7,7 +7,7 @@ import secrets
 from functools import wraps
 from datetime import date, datetime
 from flask import jsonify, request, url_for, abort, make_response
-from flask_restx import Api, Resource, fields, reqparse  # , inputs
+from flask_restx import Resource, fields, reqparse  # , inputs
 from service.common import status  # HTTP Status Codes
 from service.models import Product, Wishlist
 
@@ -225,7 +225,7 @@ class WishlistCollection(Resource):
         location_url = url_for("wishlist_resource", wishlist_id=new_list.id, _external=True)
 
         return message, status.HTTP_201_CREATED, {"Location": location_url}
-    
+
 
 ######################################################################
 #  PATH: /wishlists/{wishlist_id}
@@ -242,9 +242,9 @@ class WishlistResource(Resource):
     DELETE /wishlist{wishlist_id} -  Deletes a Wishlist with the id
     """
 
-    #------------------------------------------------------------------
+    # ------------------------------------------------------------------
     # RETRIEVE A WISHLIST
-    #------------------------------------------------------------------
+    # ------------------------------------------------------------------
     @api.doc('get_wishlists')
     @api.response(404, 'Wishlist not found')
     @api.marshal_with(wishlist_model)
@@ -260,9 +260,9 @@ class WishlistResource(Resource):
             abort(status.HTTP_404_NOT_FOUND, "Wishlist with id '{}' was not found.".format(wishlist_id))
         return wishlist.serialize(), status.HTTP_200_OK
 
-    #------------------------------------------------------------------
+    # ------------------------------------------------------------------
     # UPDATE AN EXISTING WISHLIST
-    #------------------------------------------------------------------
+    # ------------------------------------------------------------------
     @api.doc('update_wishlists', security='apikey')
     @api.response(404, 'Wishlist not found')
     @api.response(400, 'The posted Wishlist data was not valid')
@@ -286,9 +286,9 @@ class WishlistResource(Resource):
         wishlist.update()
         return wishlist.serialize(), status.HTTP_200_OK
 
-    #------------------------------------------------------------------
+    # ------------------------------------------------------------------
     # DELETE A WISHLIST
-    #------------------------------------------------------------------
+    # ------------------------------------------------------------------
     @api.doc('delete_wishlists', security='apikey')
     @api.response(204, 'Wishlist deleted')
     # @token_required
