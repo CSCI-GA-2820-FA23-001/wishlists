@@ -4,6 +4,7 @@ Wishlist Service
 Wishlist service for shopping
 """
 import secrets
+
 # from functools import wraps
 from datetime import date, datetime
 from flask import jsonify, request, url_for, abort, make_response
@@ -115,13 +116,6 @@ wishlist_args.add_argument(
 
 product_args = reqparse.RequestParser()
 product_args.add_argument(
-    "wishlist_id",
-    type=int,
-    location="args",
-    required=True,
-    help="List Products by wishlist_id",
-)
-product_args.add_argument(
     "name", type=str, location="args", required=False, help="List Products by name"
 )
 
@@ -222,7 +216,9 @@ class WishlistCollection(Resource):
         app.logger.info("Wishlist created with id: %d", message["id"])
 
         # needs to be updated after refactoring done
-        location_url = url_for("wishlist_resource", wishlist_id=new_list.id, _external=True)
+        location_url = url_for(
+            "wishlist_resource", wishlist_id=new_list.id, _external=True
+        )
 
         return message, status.HTTP_201_CREATED, {"Location": location_url}
 
@@ -230,8 +226,8 @@ class WishlistCollection(Resource):
 ######################################################################
 #  PATH: /wishlists/{wishlist_id}
 ######################################################################
-@api.route('/wishlists/<wishlist_id>')
-@api.param('wishlist_id', 'The Wishlist identifier')
+@api.route("/wishlists/<wishlist_id>")
+@api.param("wishlist_id", "The Wishlist identifier")
 class WishlistResource(Resource):
     """
     WishlistResource class
@@ -245,8 +241,8 @@ class WishlistResource(Resource):
     # ------------------------------------------------------------------
     # RETRIEVE A WISHLIST
     # ------------------------------------------------------------------
-    @api.doc('get_wishlists')
-    @api.response(404, 'Wishlist not found')
+    @api.doc("get_wishlists")
+    @api.response(404, "Wishlist not found")
     @api.marshal_with(wishlist_model)
     def get(self, wishlist_id):
         """
@@ -257,15 +253,18 @@ class WishlistResource(Resource):
         app.logger.info("Request to Retrieve a wishlist with id [%s]", wishlist_id)
         wishlist = Wishlist.find(wishlist_id)
         if not wishlist:
-            abort(status.HTTP_404_NOT_FOUND, f"Wishlist with id '{wishlist_id}' could not be found.")
+            abort(
+                status.HTTP_404_NOT_FOUND,
+                f"Wishlist with id '{wishlist_id}' could not be found.",
+            )
         return wishlist.serialize(), status.HTTP_200_OK
 
     # ------------------------------------------------------------------
     # UPDATE AN EXISTING WISHLIST
     # ------------------------------------------------------------------
-    @api.doc('update_wishlists', security='apikey')
-    @api.response(404, 'Wishlist not found')
-    @api.response(400, 'The posted Wishlist data was not valid')
+    @api.doc("update_wishlists", security="apikey")
+    @api.response(404, "Wishlist not found")
+    @api.response(400, "The posted Wishlist data was not valid")
     @api.expect(wishlist_model)
     @api.marshal_with(wishlist_model)
     # @token_required
@@ -275,11 +274,14 @@ class WishlistResource(Resource):
 
         This endpoint will update a Wishlist based the body that is posted
         """
-        app.logger.info('Request to Update a wishlist with id [%s]', wishlist_id)
+        app.logger.info("Request to Update a wishlist with id [%s]", wishlist_id)
         wishlist = Wishlist.find(wishlist_id)
         if not wishlist:
-            abort(status.HTTP_404_NOT_FOUND, f"Wishlist with id '{wishlist_id}' could not be found.")
-        app.logger.debug('Payload = %s', api.payload)
+            abort(
+                status.HTTP_404_NOT_FOUND,
+                f"Wishlist with id '{wishlist_id}' could not be found.",
+            )
+        app.logger.debug("Payload = %s", api.payload)
         data = api.payload
         wishlist.deserialize(data)
         wishlist.id = wishlist_id
@@ -289,8 +291,8 @@ class WishlistResource(Resource):
     # ------------------------------------------------------------------
     # DELETE A WISHLIST
     # ------------------------------------------------------------------
-    @api.doc('delete_wishlists', security='apikey')
-    @api.response(204, 'Wishlist deleted')
+    @api.doc("delete_wishlists", security="apikey")
+    @api.response(204, "Wishlist deleted")
     # @token_required
     def delete(self, wishlist_id):
         """
@@ -298,84 +300,105 @@ class WishlistResource(Resource):
 
         This endpoint will delete a Wishlist based the id specified in the path
         """
-        app.logger.info('Request to Update a wishlist with id [%s]', wishlist_id)
+        app.logger.info("Request to Update a wishlist with id [%s]", wishlist_id)
         wishlist = Wishlist.find(wishlist_id)
         if wishlist:
             wishlist.delete()
-            app.logger.info('Wishlist with id [%s] was deleted', wishlist_id)
+            app.logger.info("Wishlist with id [%s] was deleted", wishlist_id)
 
-        return '', status.HTTP_204_NO_CONTENT
+        return "", status.HTTP_204_NO_CONTENT
 
 
 ######################################################################
-# LIST PRODUCTS
+# PATH: /wishlists/<int:wishlist_id>/products
 ######################################################################
-@app.route(f"{BASE_URL}/<int:wishlist_id>/products", methods=["GET"])
-def list_products(wishlist_id):
-    """Returns all of the products for a wishlist"""
-    app.logger.info("Request for all Products for Wishlist with id: %s", wishlist_id)
+@api.route("/wishlists/<wishlist_id>/products", strict_slashes=False)
+@api.param("wishlist_id", "The Wishlist id")
+class ProductCollection(Resource):
+    """
+    ProductCollection class
 
-    # See if the wishlist exists and abort if it doesn't
-    wishlist = Wishlist.find(wishlist_id)
-    if not wishlist:
-        abort(
-            status.HTTP_404_NOT_FOUND,
-            f"Wishlist with id '{wishlist_id}' could not be found.",
+    Allows the manipulation of the products in one wishlist
+    GET /wishlists/<int:wishlist_id>/products - Returns a list of product in a Wishlist based on wishlist's id
+    POST /wishlists/<int:wishlist_id>/products - create a product in a wishlist based the data posted
+    """
+
+    # ------------------------------------------------------------------
+    # LIST ALL PRODUCTS IN A WISHLIST
+    # ------------------------------------------------------------------
+    @api.doc("list_products")
+    @api.response(404, "products in wishlist not found")
+    @api.marshal_list_with(product_model)
+    def get(self, wishlist_id):
+        """Returns all of the products for a wishlist"""
+        app.logger.info(
+            "Request for all Products for Wishlist with id: %s", wishlist_id
         )
 
-    # Get query args
-    name = request.args.get("name")
-    if name:
-        products = wishlist.find_product_by_name(name)
-        results = [product.serialize() for product in products]
-    else:
-        results = [product.serialize() for product in wishlist.products]
+        # See if the wishlist exists and abort if it doesn't
+        wishlist = Wishlist.find(wishlist_id)
+        if not wishlist:
+            abort(
+                status.HTTP_404_NOT_FOUND,
+                f"Wishlist with id '{wishlist_id}' could not be found.",
+            )
 
-    return make_response(jsonify(results), status.HTTP_200_OK)
+        # Get query args
+        args = product_args.parse_args()
+        if args["name"]:
+            products = wishlist.find_product_by_name(args["name"])
+            results = [product.serialize() for product in products]
+        else:
+            results = [product.serialize() for product in wishlist.products]
 
+        return results, status.HTTP_200_OK
 
-######################################################################
-#  CREATE a product in the wishlist
-######################################################################
-@app.route(f"{BASE_URL}/<int:wishlist_id>/products", methods=["POST"])
-def create_products(wishlist_id):
-    """
-    Create a product
+    # ------------------------------------------------------------------
+    #  CREATE a product in the wishlist
+    # ------------------------------------------------------------------
+    @api.doc("create_product", security="apikey")
+    @api.response(400, "The posted data was not valid")
+    @api.expect(create_product_model)
+    @api.marshal_with(product_model, code=201)
+    # @token_required
+    def post(self, wishlist_id):
+        """
+        Create a product
 
-    This endpoint will create a product based the data in the body that is posted
-    """
-    app.logger.info("Request to create a product in wishlist %d", wishlist_id)
-    check_content_type("application/json")
+        This endpoint will create a product based the data in the body that is posted
+        """
+        app.logger.info("Request to create a product in wishlist %d", wishlist_id)
 
-    wishlist = Wishlist.find(wishlist_id)
-    if not wishlist:
-        abort(
-            status.HTTP_404_NOT_FOUND,
-            f"Wishlist {wishlist_id} not exist",
+        wishlist = Wishlist.find(wishlist_id)
+        if not wishlist:
+            abort(
+                status.HTTP_404_NOT_FOUND,
+                f"Wishlist {wishlist_id} not exist",
+            )
+        # Create the product
+        new_product = Product()
+        info = api.payload
+        if info["wishlist_id"] != wishlist.id:
+            info["wishlist_id"] = wishlist.id  # Update wishlist_id if not consistent
+        new_product.deserialize(info)
+        new_product.wishlist = wishlist
+        new_product.create()
+
+        # wishlist.products.append(new_product)
+        wishlist.update()
+
+        # Return response
+        message = new_product.serialize()
+
+        # need to refactor after ProductResource created
+        location_url = url_for(
+            "wishlist_resource",
+            wishlist_id=wishlist.id,
+            product_id=new_product.id,
+            _external=True,
         )
-    # Create the product
-    new_product = Product()
-    info = request.get_json()
-    if info["wishlist_id"] != wishlist.id:
-        info["wishlist_id"] = wishlist.id  # Update wishlist_id if not consistent
-    new_product.deserialize(info)
-    new_product.wishlist = wishlist
-    new_product.create()
 
-    # wishlist.products.append(new_product)
-    wishlist.update()
-
-    # Return response
-    message = new_product.serialize()
-
-    location_url = url_for(
-        "get_product",
-        wishlist_id=wishlist.id,
-        product_id=new_product.id,
-        _external=True,
-    )
-
-    return jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
+        return message, status.HTTP_201_CREATED, {"Location": location_url}
 
 
 ######################################################################
