@@ -1,9 +1,9 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: wishlist
+  name: wishlists
   labels:
-    app: wishlist
+    app: wishlists
 spec:
   replicas: 2
   strategy:
@@ -13,19 +13,19 @@ spec:
       maxUnavailable: 50%
   selector:
     matchLabels:
-      app: wishlist
+      app: wishlists
   template:
     metadata:
       labels:
-        app: wishlist
+        app: wishlists
     spec:
       imagePullSecrets:
       - name: all-icr-io
       restartPolicy: Always
       containers:
-      - name: wishlist
+      - name: wishlists
         image: cluster-registry:32000/wishlists:latest
-        # image: wishlist
+        # image: wishlists
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8080
