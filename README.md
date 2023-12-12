@@ -28,7 +28,7 @@ Before Run, make sure you have install [Docker Desktop](https://www.docker.com/p
 $ honcho start
 ```
 
-To run the all the test cases locally, please run the command ```make test```. The test cases have 95% code coverage currently.
+To run the all the test cases locally, please run the command ```make test```. The test cases have 98% code coverage currently.
 
 
 
@@ -47,8 +47,11 @@ Then use the commands to build, tag and push the image:
 Finally, use the command to deploy the service to Kubernetes:
 
 - ```kubectl apply -f k8s```
-## Test the deployment
-Check the status of microservice using ```/health``` endpoint. Run the following command upon copying ```service_ip``` and ```service_port``` from the details provided.  
+
+## Deploy to OpenShift
+Our service is now available at [Wishlist Service](https://wishlists-chrisxhhh-dev.apps.sandbox-m2.ll9k.p1.openshiftapps.com/)
+
+Check the status of microservice using ```/health``` endpoint. Run the following command:
 ```
 curl https://wishlists-chrisxhhh-dev.apps.sandbox-m2.ll9k.p1.openshiftapps.com/health
 ```
