@@ -11,7 +11,7 @@ from service.models import Wishlist, Product, DataValidationError, db
 from tests.factories import WishlistFactory, ProductFactory
 
 DATABASE_URI = os.getenv(
-    "DATABASE_URI", "postgresql://postgres:postgres@localhost:5432/postgres"
+    "DATABASE_URI", "postgresql+psycopg://postgres:postgres@localhost:5432/postgres"
 )
 
 
