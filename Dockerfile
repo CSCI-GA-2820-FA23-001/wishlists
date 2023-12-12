@@ -2,7 +2,7 @@
 # Create a builder image to compile in
 ##################################################
 FROM python:3.11-slim as builder
-FROM rofrano/pipeline-selenium
+# FROM rofrano/pipeline-selenium
 
 # Added libraries for PostgreSQL before pip install
 RUN apt-get update && apt-get install -y gcc libpq-dev
