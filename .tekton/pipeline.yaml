@@ -139,7 +139,7 @@ spec:
     - name: deploy-image
       params:
         - name: old_image_name
-          value: 'cluster-registry:32000/wishlist:latest'
+          value: 'cluster-registry:32000/wishlists:latest'
         - name: image_name
           value: $(params.IMAGE_NAME)
         - name: manifest_dir

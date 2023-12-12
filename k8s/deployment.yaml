@@ -24,7 +24,7 @@ spec:
       restartPolicy: Always
       containers:
       - name: wishlist
-        image: cluster-registry:32000/wishlist:latest
+        image: cluster-registry:32000/wishlists:latest
         # image: wishlist
         imagePullPolicy: IfNotPresent
         ports:
