@@ -19,8 +19,8 @@ spec:
       labels:
         app: wishlists
     spec:
-      imagePullSecrets:
-      - name: all-icr-io
+      # imagePullSecrets:
+      # - name: all-icr-io
       restartPolicy: Always
       containers:
       - name: wishlists
@@ -32,7 +32,7 @@ spec:
           protocol: TCP
         env:
           - name: RETRY_COUNT
-            value: "9"
+            value: "10"
           - name: DATABASE_URI
             valueFrom:
               secretKeyRef:
