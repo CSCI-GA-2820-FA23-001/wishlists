@@ -50,7 +50,7 @@ Finally, use the command to deploy the service to Kubernetes:
 ## Test the deployment
 Check the status of microservice using ```/health``` endpoint. Run the following command upon copying ```service_ip``` and ```service_port``` from the details provided.  
 ```
-curl http://<service_ip>:<service_port>/health
+curl https://wishlists-chrisxhhh-dev.apps.sandbox-m2.ll9k.p1.openshiftapps.com/health
 ```
 
 ## Wishlist Model
