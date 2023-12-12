@@ -22,8 +22,15 @@ Before Run, make sure you have install [Docker Desktop](https://www.docker.com/p
 - Reopen the folder in Dev Container
 - Run ```flask run``` command on the terminal
 - The service is available at localhost: ```http://localhost:8000```
+- Or uses *honcho* which gets it's commands from the `Procfile`. To start the service simply use:
+            
+```shell
+$ honcho start
+```
 
 To run the all the test cases locally, please run the command ```make test```. The test cases have 95% code coverage currently.
+
+
 
 ## Deploy to Kubernetes locally
 
@@ -72,15 +79,15 @@ Endpoint          Methods  Rule
 index              GET      /
 list_wishlists     GET      /wishlists
 create_wishlists   POST     /wishlists
-get_wishlists      GET      /wishlists/<wishlist_id>
-update_wishlists   PUT      /wishlists/<wishlist_id>
-delete_wishlists   DELETE   /wishlists/<wishlist_id>
+get_wishlists      GET      /wishlists/<int: wishlist_id>
+update_wishlists   PUT      /wishlists/<int: wishlist_id>
+delete_wishlists   DELETE   /wishlists/<int: wishlist_id>
 
-list_products      GET      /wishlists/<wishlist_id>/products
-create_products    POST     /wishlists/<wishlist_id>/products
-get_products       GET      /wishlists/<wishlist_id>/products/<product_id>
-update_products    PUT      /wishlists/<wishlist_id>/products/<product_id>
-delete_products    DELETE   /wishlists/<wishlist_id>/products/<product_id>
+list_products      GET      /wishlists/<int: wishlist_id>/products
+create_products    POST     /wishlists/<int: wishlist_id>/products
+get_products       GET      /wishlists/<int: wishlist_id>/products/<int: product_id>
+update_products    PUT      /wishlists/<int: wishlist_id>/products/<int: product_id>
+delete_products    DELETE   /wishlists/<int: wishlist_id>/products/<int: product_id>
 ```
 <!-- 
 The test cases have 95% test coverage and can be run with `make test` -->
