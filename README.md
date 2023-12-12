@@ -47,7 +47,11 @@ Then use the commands to build, tag and push the image:
 Finally, use the command to deploy the service to Kubernetes:
 
 - ```kubectl apply -f k8s```
-
+## Test the deployment
+Check the status of microservice using ```/health``` endpoint. Run the following command upon copying ```service_ip``` and ```service_port``` from the details provided.  
+```
+curl http://<service_ip>:<service_port>/health
+```
 
 ## Wishlist Model
 ```
@@ -81,7 +85,7 @@ list_wishlists     GET      /wishlists
 create_wishlists   POST     /wishlists
 get_wishlists      GET      /wishlists/<int: wishlist_id>
 update_wishlists   PUT      /wishlists/<int: wishlist_id>
-delete_wishlists   DELETE   /wishlists/<int: wishlist_id>
+copy_wishlists     POST   /wishlists/<int: wishlist_id>
 
 list_products      GET      /wishlists/<int: wishlist_id>/products
 create_products    POST     /wishlists/<int: wishlist_id>/products
@@ -99,27 +103,51 @@ The test cases have 95% test coverage and can be run with `make test` -->
 The project contains the following:
 
 ```text
-.gitignore          - this will ignore vagrant and other metadata files
-.flaskenv           - Environment variables to configure Flask
-.gitattributes      - File to gix Windows CRLF issues
-.devcontainers/     - Folder with support for VSCode Remote Containers
-dot-env-example     - copy to .env to use environment variables
-requirements.txt    - list if Python libraries required by your code
-config.py           - configuration parameters
+.gitignore                            - this will ignore vagrant and other metadata files
+.flaskenv                             - Environment variables to configure Flask
+.gitattributes                        - File to gix Windows CRLF issues
+.devcontainers/                       - Folder with support for VSCode Remote Containers
+dot-env-example                       - copy to .env to use environment variables
+requirements.txt                      - list if Python libraries required by your code
+config.py                             - configuration parameters
 
-service/                   - service python package
-├── __init__.py            - package initializer
-├── models.py              - module with business models
-├── routes.py              - module with service routes
-└── common                 - common code package
-    ├── error_handlers.py  - HTTP error handling code
-    ├── log_handlers.py    - logging setup code
-    └── status.py          - HTTP status constants
+features/
+├── steps.py                          - define file for the BDD tests
+│   ├── web_steps.py                  - define specific to web interactions
+│   └── wishlists_steps.py            - define specifically for the 'wishlists' feature
+├── enviroments.py                    - setup and teardown methods that are executed before and after each scenario or suite of tests
+└── wishlists.feature                 - feature file for the 'wishlists' functionality
 
-tests/              - test cases package
-├── __init__.py     - package initializer
-├── test_models.py  - test suite for business models
-└── test_routes.py  - test suite for service routes
+.tekton/
+├── events/                           - holds Tekton Triggers resources for handling external events.
+│   ├── event_listener.yaml           - defines an EventListener
+│   ├── trigger.yaml                  - specifies a Trigger
+│   ├── trigger_binding.yaml          - contains TriggerBindings
+│   └── trigger_template.yaml         - holds a TriggerTemplate
+├── pipeline.yaml                     - main pipeline definition that specifies tasks to be executed
+├── tasks.yaml                        - defines the individual tasks that the pipeline will run
+└── workspace.yaml                    - specifies workspace definitions for sharing data between tasks in a pipeline
+
+k8s/
+├── deployment.yaml                   - defines application's deployment
+├── ingress.yaml                      - ingress rules
+├── postgres.yaml                     - deploy a PostgreSQL database within the cluster
+├── pv.yaml                           - sefines Persistent Volume (PV) resources
+└── service.yaml                      - specifies the service objects, pods, network traffic
+
+service/                              - service python package
+├── __init__.py                       - package initializer
+├── models.py                         - module with business models
+├── routes.py                         - module with service routes
+└── common                            - common code package
+    ├── error_handlers.py             - HTTP error handling code
+    ├── log_handlers.py               - logging setup code
+    └── status.py                     - HTTP status constants
+
+tests/                                - test cases package
+├── __init__.py                       - package initializer
+├── test_models.py                    - test suite for business models
+└── test_routes.py                    - test suite for service routes
 ```
 
 ## License
